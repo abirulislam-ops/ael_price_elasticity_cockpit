@@ -718,6 +718,7 @@ function barChart(container, items, opts){
     var bw=Math.max(2,(it.value/max)*(x1-x0));
     var yy=y0+idx*bh+4;
     svg.appendChild(el("rect",{x:x0,y:yy,width:bw,height:bh-8,rx:3,fill:it.color||"#2f7dff"}));
+    svg.appendChild(el("rect",{x:x0,y:y0+idx*bh,width:x1-x0,height:bh,fill:"transparent",onmousemove:"tip(event,'<b>"+esc(it.label)+"</b><br>"+esc((opts.fmt||String)(it.value))+"')",onmouseout:"untip()"}));
     svg.appendChild(txt(x0-8,yy+bh/2-4,it.label.length>24?it.label.slice(0,23)+"…":it.label,{anchor:"end",fill:C.muted,size:"12.5"}));
     svg.appendChild(txt(x0+bw+5,yy+bh/2-4,(opts.fmt||String)(it.value),{anchor:"start",fill:C.tx,size:"12.5"}));
   });
@@ -742,7 +743,7 @@ function groupedBar(container, categories, series, opts){
     series.forEach(function(s,si){
       var v=s.data[ci]; var bh=(v/max)*(y1-y0);
       var xx=x0+ci*gw+gw*0.15+si*bw;
-      svg.appendChild(el("rect",{x:xx,y:y1-bh,width:bw-2,height:bh,rx:1,fill:colors[si%colors.length]}));
+      svg.appendChild(el("rect",{x:xx,y:y1-bh,width:bw-2,height:bh,rx:1,fill:colors[si%colors.length],onmousemove:"tip(event,'<b>"+esc(c)+"</b><br>"+esc(s.name)+": "+esc((opts.yfmt||fmtY)(v))+"')",onmouseout:"untip()"}));
     });
     svg.appendChild(txt(x0+ci*gw+gw*0.5,y1+14,c,{size:"12.5"}));
   });
@@ -789,8 +790,8 @@ function breadthChart(container, labels, upPct, dnPct){
   var gw=(x1-x0)/labels.length;
   labels.forEach(function(lb,i){
     var u=upPct[i]||0, dn=dnPct[i]||0;
-    if(u>0) svg.appendChild(el("rect",{x:x0+i*gw+gw*0.2,y:yc-half*u,width:gw*0.6,height:Math.max(1,half*u),rx:1.5,fill:"#2fd181","fill-opacity":.85}));
-    if(dn>0) svg.appendChild(el("rect",{x:x0+i*gw+gw*0.2,y:yc,width:gw*0.6,height:Math.max(1,half*dn),rx:1.5,fill:"#ff5c7a","fill-opacity":.85}));
+    if(u>0) svg.appendChild(el("rect",{x:x0+i*gw+gw*0.2,y:yc-half*u,width:gw*0.6,height:Math.max(1,half*u),rx:1.5,fill:"#2fd181","fill-opacity":.85,onmousemove:"tip(event,'<b>"+lb+"</b><br>Raising: "+(u*100).toFixed(0)+"%')",onmouseout:"untip()"}));
+    if(dn>0) svg.appendChild(el("rect",{x:x0+i*gw+gw*0.2,y:yc,width:gw*0.6,height:Math.max(1,half*dn),rx:1.5,fill:"#ff5c7a","fill-opacity":.85,onmousemove:"tip(event,'<b>"+lb+"</b><br>Cutting: "+(dn*100).toFixed(0)+"%')",onmouseout:"untip()"}));
   });
   var step=Math.max(1,Math.ceil(labels.length/13));
   labels.forEach(function(lb,i){ if(i%step===0) svg.appendChild(txt(x0+i*gw+gw/2,H-10,lb,{size:"12"})); });
@@ -1276,6 +1277,7 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
       var bw=Math.max(2,(Math.sqrt(it.value)/mx)*(x1-x0));
       var yy=y0+idx*bh+4;
       var rect=document.createElementNS("http://www.w3.org/2000/svg","rect"); rect.setAttribute("x",x0); rect.setAttribute("y",yy); rect.setAttribute("width",bw); rect.setAttribute("height",bh-8); rect.setAttribute("rx","3"); rect.setAttribute("fill",it.color||"#2f7dff"); svg.appendChild(rect);
+      var hit=document.createElementNS("http://www.w3.org/2000/svg","rect"); hit.setAttribute("x",x0); hit.setAttribute("y",y0+idx*bh); hit.setAttribute("width",x1-x0); hit.setAttribute("height",bh); hit.setAttribute("fill","transparent"); hit.addEventListener("mousemove",function(ev){ tip(ev,"<b>"+it.label+"</b><br>"+it.value+"% share"); }); hit.addEventListener("mouseout",function(){ untip(); }); svg.appendChild(hit);
       var t1=document.createElementNS("http://www.w3.org/2000/svg","text"); t1.setAttribute("x",x0-8); t1.setAttribute("y",yy+bh/2-4); t1.setAttribute("fill","#8fa0c4"); t1.setAttribute("font-size","12.5"); t1.setAttribute("text-anchor","end"); t1.textContent=it.label.length>24?it.label.slice(0,23)+"…":it.label; svg.appendChild(t1);
       var t2=document.createElementNS("http://www.w3.org/2000/svg","text"); t2.setAttribute("x",x0+bw+5); t2.setAttribute("y",yy+bh/2-4); t2.setAttribute("fill","#e6ecff"); t2.setAttribute("font-size","12.5"); t2.textContent=it.value+"%"; svg.appendChild(t2);
     });
@@ -1481,7 +1483,7 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
     items.forEach(function(it,idx){
       var bw=Math.max(2,(Math.log(1+it.val)/mx)*(x1-x0));
       var yy=y0+idx*bh+4;
-      var rect=document.createElementNS("http://www.w3.org/2000/svg","rect"); rect.setAttribute("x",x0); rect.setAttribute("y",yy); rect.setAttribute("width",bw); rect.setAttribute("height",bh-8); rect.setAttribute("rx","3"); rect.setAttribute("fill","#ff5c7a"); rect.setAttribute("style","cursor:pointer"); rect.addEventListener("click",function(){ onBarClick(it.label); }); svg.appendChild(rect);
+      var rect=document.createElementNS("http://www.w3.org/2000/svg","rect"); rect.setAttribute("x",x0); rect.setAttribute("y",yy); rect.setAttribute("width",bw); rect.setAttribute("height",bh-8); rect.setAttribute("rx","3"); rect.setAttribute("fill","#ff5c7a"); rect.setAttribute("style","cursor:pointer"); rect.addEventListener("click",function(){ onBarClick(it.label); }); rect.addEventListener("mousemove",function(ev){ tip(ev,"<b>"+it.label+"</b><br>Loss: −"+it.val.toFixed(2)+" Cr"); }); rect.addEventListener("mouseout",function(){ untip(); }); svg.appendChild(rect);
       var t1=document.createElementNS("http://www.w3.org/2000/svg","text"); t1.setAttribute("x",x0-8); t1.setAttribute("y",yy+bh/2-4); t1.setAttribute("fill","#8fa0c4"); t1.setAttribute("font-size","12.5"); t1.setAttribute("text-anchor","end"); t1.textContent=it.label; svg.appendChild(t1);
       var t2=document.createElementNS("http://www.w3.org/2000/svg","text"); t2.setAttribute("x",x0+bw+5); t2.setAttribute("y",yy+bh/2-4); t2.setAttribute("fill","#e6ecff"); t2.setAttribute("font-size","12.5"); t2.textContent="−"+it.val.toFixed(2)+" Cr"; svg.appendChild(t2);
     });
