@@ -384,22 +384,36 @@
 
 <!-- ============ VOICE OF CUSTOMER ============ -->
 <section id="voc">
-  <div class="guide"><span class="gl">What this answers</span><p>Which customers AEL has stopped serving — who, where, how much, and how long since their last order.</p><span class="gl">How to read it</span><p>Activeness = time since the last order (as of Nov 2026): <b>Need attention</b> = no order for 4–5 months (Jun–Jul); <b>Need follow up</b> = no order for 2–3 months (Aug–Sep). Call status / win-back come from the CRM call-back register.</p></div>
+  <div class="guide"><span class="gl">What this answers</span><p>Which customers AEL is serving and which it has stopped serving — who, where, how much, and how long since their last order.</p><span class="gl">How to read it</span><p>Activeness = time since the last order (as of Nov 2026): <b>Active</b> = ordered Oct–Nov (0–1 mo); <b>Follow up</b> = Aug–Sep (2–3 mo); <b>Need attention</b> = Jun–Jul (4–5 mo); <b>Churned</b> = before Jun 2026 (6+ mo). <b>Segment</b> = the dealer's primary distribution channel (most frequent). Call status / win-back come from the CRM call-back register.</p></div>
   <div class="grid g4" id="vocKpis" style="margin-bottom:12px"></div>
   <div class="card">
-    <h3>Lost customer register — activeness (as of Nov'26)</h3>
-    <div class="hint">Last order month + amount, and this FY (Jul–Nov) order amount. Only inactive customers are listed.</div>
+    <h3>Customer activeness register — as of Nov'26</h3>
+    <div class="hint">Last order month + amount, and this FY (Jul–Nov) order amount. All customers, tagged Active / Follow up / Need attention / Churned. Segment = primary distribution channel.</div>
     <div class="toolbar">
       <select id="vocAct">
         <option value="all">All activeness</option>
-        <option value="Need attention">Need attention (4–5 mo idle)</option>
-        <option value="Need follow up">Need follow up (2–3 mo idle)</option>
+        <option value="Active">Active (0–1 mo)</option>
+        <option value="Follow up">Follow up (2–3 mo)</option>
+        <option value="Need attention">Need attention (4–5 mo)</option>
+        <option value="Churned (6+ months)">Churned (6+ mo)</option>
       </select>
       <select id="vocSeg">
         <option value="all">All segments</option>
-        <option value="Dealers (Trade)">Dealers (Trade)</option>
+        <option value="Bulk">Bulk</option>
+        <option value="Distributor">Distributor</option>
+        <option value="Bulk Flour & Dal">Bulk Flour &amp; Dal</option>
+        <option value="Rice Bulk">Rice Bulk</option>
         <option value="Corporate">Corporate</option>
+        <option value="Dealer">Dealer</option>
+        <option value="Export">Export</option>
         <option value="Sister Concern">Sister Concern</option>
+        <option value="Chain Store">Chain Store</option>
+        <option value="Employee">Employee</option>
+        <option value="Government">Government</option>
+        <option value="HORECA">HORECA</option>
+        <option value="E-Commerce">E-Commerce</option>
+        <option value="Trading">Trading</option>
+        <option value="Tender">Tender</option>
         <option value="Other">Other</option>
       </select>
     </div>
@@ -1368,32 +1382,41 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
 
 /* ============ VOICE OF CUSTOMER ============ */
 (function(){
-  var voc = D.voc || [];
+  var voc = D.vocReg || D.voc || [];
   var MNAM = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  function seg(ch){ if(!ch) return "Other"; if(ch==="Dealer"||ch==="Distributor") return "Dealers (Trade)"; if(ch==="Corporate") return "Corporate"; if(ch==="Sister Concern") return "Sister Concern"; return "Other"; }
-  var att = voc.filter(function(r){ return r[6]==="Need attention"; });
-  var fu = voc.filter(function(r){ return r[6]==="Need follow up"; });
-  var attVal = att.reduce(function(s,r){return s+r[5];},0);
-  var fuVal = fu.reduce(function(s,r){return s+r[5];},0);
-  var zm = {}; voc.forEach(function(r){ zm[r[1]]=(zm[r[1]]||0)+1; });
-  var topZone = Object.keys(zm).sort(function(a,b){return zm[b]-zm[a];})[0];
+  function actTag(act){
+    if(act==="Active") return '<span class="tag t-neg">Active</span>';
+    if(act==="Follow up") return '<span class="tag t-warn">Follow up</span>';
+    if(act==="Need attention") return '<span class="tag t-pos">Need attention</span>';
+    return '<span class="tag t-mut">Churned 6+ mo</span>';
+  }
+  function lastMoLab(r){
+    var d = r[8] || ""; if(d.length < 7) return "—";
+    return MNAM[+d.slice(5,7)-1] + "&#39;" + d.slice(2,4);
+  }
+  var active = voc.filter(function(r){ return r[7]==="Active"; });
+  var fu = voc.filter(function(r){ return r[7]==="Follow up"; });
+  var att = voc.filter(function(r){ return r[7]==="Need attention"; });
+  var churn = voc.filter(function(r){ return r[7]==="Churned (6+ months)"; });
+  var fuVal = fu.reduce(function(s,r){return s+r[6];},0);
+  var attVal = att.reduce(function(s,r){return s+r[6];},0);
+  var churnVal = churn.reduce(function(s,r){return s+r[6];},0);
   var k=[
-    {l:"Need attention (4–5 mo idle)",v:att.length,n:cr(attVal)+" FY value",c:"down"},
-    {l:"Need follow up (2–3 mo idle)",v:fu.length,n:cr(fuVal)+" FY value",c:"down"},
-    {l:"Total inactive customers",v:voc.length,n:"last order Jun–Sep 2026"},
-    {l:"Top idle zone",v:topZone||"—",n:zm[topZone]+" idle customers"}
+    {l:"Active (0–1 mo)",v:active.length,n:"ordered Oct–Nov'26",c:"pos"},
+    {l:"Follow up (2–3 mo)",v:fu.length,n:cr(fuVal)+" FY value",c:"down"},
+    {l:"Need attention (4–5 mo)",v:att.length,n:cr(attVal)+" FY value",c:"down"},
+    {l:"Churned (6+ mo)",v:churn.length,n:cr(churnVal)+" FY value",c:"down"}
   ];
   document.getElementById("vocKpis").innerHTML=k.map(function(x){ return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
   function renderVoc(){
-    var act = document.getElementById("vocAct").value;
+    var actf = document.getElementById("vocAct").value;
     var segf = document.getElementById("vocSeg").value;
-    var rows = voc.filter(function(r){ return (act==="all"||r[6]===act) && (segf==="all"||seg(r[2])===segf); });
-    var h='<table><thead><tr><th>Customer</th><th>Segment</th><th>Zone</th><th>Last order month</th><th>Last order amount (৳ Cr)</th><th>This FY amount (৳ Cr)</th><th>Activeness</th></tr></thead><tbody>';
+    var rows = voc.filter(function(r){ return (actf==="all"||r[7]===actf) && (segf==="all"||((r[3]||"Other")===segf)); });
+    var h='<table><thead><tr><th>Customer</th><th>Segment</th><th>Zone</th><th>Last order month</th><th>Last order amount (৳ Cr)</th><th>FY 26-27 amount (৳ Cr)</th><th>Activeness</th></tr></thead><tbody>';
     rows.slice(0,150).forEach(function(r){
-      var actTag = r[6]==="Need attention" ? '<span class="tag t-pos">Need attention</span>' : '<span class="tag t-warn">Need follow up</span>';
-      h+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(seg(r[2]))+'</td><td>'+esc(r[1])+'</td><td>'+MNAM[r[3]-1]+"&#39;26</td><td>"+cr(r[4])+'</td><td>'+cr(r[5])+'</td><td>'+actTag+'</td></tr>';
+      h+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[3]||"—")+'</td><td>'+esc(r[1])+'</td><td>'+lastMoLab(r)+'</td><td>'+cr(r[5])+'</td><td>'+cr(r[6])+'</td><td>'+actTag(r[7])+'</td></tr>';
     });
-    h+='</tbody></table><div class="small" style="margin-top:8px">'+rows.length+' inactive customers. "Need attention" = no order for 4–5 months; "Need follow up" = 2–3 months. Call status / win-back = pending CRM sheet.</div>';
+    h+='</tbody></table><div class="small" style="margin-top:8px">'+rows.length+' customers (showing first 150 — use the filters to narrow). Tagged Active / Follow up / Need attention / Churned as of Nov 2026. Segment = primary distribution channel. Call status / win-back = pending CRM sheet.</div>';
     document.getElementById("vocTable").innerHTML=h;
   }
   document.getElementById("vocAct").addEventListener("change", renderVoc);
