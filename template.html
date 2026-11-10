@@ -766,9 +766,9 @@ function overlayBarLine(container, labels, bars, line, opts){
     var bh=(v/maxB)*(y1-y0);
     svg.appendChild(el("rect",{x:x0+i*gw+gw*0.18,y:y1-bh,width:gw*0.64,height:Math.max(1,bh),rx:1.5,fill:opts.barColor||"#2f7dff","fill-opacity":.85,onmousemove:"tip(event,'"+labels[i]+"<br>"+(opts.barName||"Revenue")+": "+esc((opts.tipfmt||opts.yfmt||fmtY)(v))+"')",onmouseout:"untip()"}));
   });
-  var d=""; line.forEach(function(v,i){ d+=(i?"L":"M")+(x0+i*gw+gw/2).toFixed(1)+","+(y1-(v/maxL)*(y1-y0)).toFixed(1); });
+  var d="", open=false; line.forEach(function(v,i){ if(v==null||isNaN(v)){ open=false; return; } d+=(open?"L":"M")+(x0+i*gw+gw/2).toFixed(1)+","+(y1-(v/maxL)*(y1-y0)).toFixed(1); open=true; });
   svg.appendChild(el("path",{d:d,fill:"none",stroke:opts.lineColor||"#22c3aa","stroke-width":2}));
-  line.forEach(function(v,i){ svg.appendChild(el("circle",{cx:x0+i*gw+gw/2,cy:y1-(v/maxL)*(y1-y0),r:4,fill:opts.lineColor||"#22c3aa",stroke:C.bg,"stroke-width":1,onmousemove:"tip(event,'"+labels[i]+"<br>"+(opts.lineName||"Line")+": "+Math.round(v)+"')",onmouseout:"untip()"})); });
+  line.forEach(function(v,i){ if(v==null||isNaN(v)) return; svg.appendChild(el("circle",{cx:x0+i*gw+gw/2,cy:y1-(v/maxL)*(y1-y0),r:4,fill:opts.lineColor||"#22c3aa",stroke:C.bg,"stroke-width":1,onmousemove:"tip(event,'"+labels[i]+"<br>"+(opts.lineName||"Line")+": "+Math.round(v)+"')",onmouseout:"untip()"})); });
   var step=Math.max(1,Math.ceil(labels.length/13));
   labels.forEach(function(lb,i){ if(i%step===0||i===labels.length-1) svg.appendChild(txt(x0+i*gw+gw/2,H-12,lb,{size:"12"})); });
   legend(container,[{name:opts.barName||"Bars"},{name:opts.lineName||"Line"}],[opts.barColor||"#2f7dff",opts.lineColor||"#22c3aa"]);
@@ -892,9 +892,11 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
 /* ============ OVERVIEW ============ */
 (function(){
   var y25=D.yearlyRev[2025], y24=D.yearlyRev[2024];
-  var activeCats = WINLAB.map(function(_,i){ var s=0; CATS.forEach(function(k){ if(D.catRev[k][i]>0) s++; }); return s; });
   var mlab=D.monthly.map(function(m){return mn(m[1])+"'"+String(m[0]).slice(2);});
   var mrev=D.monthly.map(function(m){return m[2];});
+  // active categories: clean window (Jul'24 → Oct'26) aligned to the full monthly x-axis (Mar'22 → Oct'26)
+  var activeCats = WINLAB.map(function(_,i){ var s=0; CATS.forEach(function(k){ if(D.catRev[k][i]>0) s++; }); return s; });
+  var activeCatsFull = new Array(mlab.length - WINLAB.length).fill(null).concat(activeCats);
   var upPct=[],dnPct=[];
   for(var i=1;i<WINLAB.length;i++){
     var up=0,dn=0,n=0;
@@ -925,7 +927,7 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
     document.getElementById("lossWinCard").innerHTML=h;
   })();
 
-  overlayBarLine(document.getElementById("cPort"),mlab,mrev,activeCats,{yfmt:fmtY,ytitle:"Revenue (৳ Cr)",barName:"Net revenue",lineName:"Active categories",tipfmt:cr});
+  overlayBarLine(document.getElementById("cPort"),mlab,mrev,activeCatsFull,{yfmt:fmtY,ytitle:"Revenue (৳ Cr)",barName:"Net revenue",lineName:"Active categories",tipfmt:cr});
   breadthChart(document.getElementById("cBreadth"),WINLAB.slice(1),upPct.slice(1),dnPct.slice(1));
 
   var elNeg=betas.filter(function(b){return b<-1;}).length, elIn=betas.filter(function(b){return b>=-1&&b<=0;}).length, elPos=betas.filter(function(b){return b>0;}).length;
