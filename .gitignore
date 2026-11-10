@@ -1,0 +1,9 @@
+# build.js holds the live ERP API key — never commit it.
+build.js
+HANDOFF.md
+
+# node / build artifacts
+node_modules/
+package.json
+package-lock.json
+*.html.bak

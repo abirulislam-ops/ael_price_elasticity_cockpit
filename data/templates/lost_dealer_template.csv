@@ -1,0 +1,2 @@
+customer_name,segment,zone,last_delivery_date,last_value_cr,reason_lost,call_status,win_back_action
+Example Dealer,Dealer (Trade),Chittagong,2026-08-31,12.5,Price competition,Not called,Offer revised trade scheme + revisit

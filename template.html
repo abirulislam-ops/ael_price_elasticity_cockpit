@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Akij Essentials (AEL) — Product Intelligence Cockpit</title>
+<style>
+  :root{
+    --bg:#0d1220; --panel:#151c2e; --panel2:#1b2440; --line:#26314f;
+    --tx:#e6ecff; --muted:#8fa0c4; --dim:#5d6c8f;
+    --accent:#2f7dff; --accent2:#22c3aa; --gold:#f0b90b; --red:#ff5c7a;
+    --green:#2fd181; --orange:#ff8a3d; --violet:#a78bfa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:linear-gradient(180deg,#0d1220,#101830 60%);color:var(--tx);font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;line-height:1.5;padding:0 0 60px;font-size:16px}
+  header{padding:20px 26px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap}
+  header h1{font-size:22px;font-weight:700;letter-spacing:.2px}
+  header h1 span{color:var(--gold)}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .badge{background:rgba(240,185,11,.12);border:1px solid rgba(240,185,11,.45);color:var(--gold);padding:5px 11px;border-radius:999px;font-size:12px;letter-spacing:.4px;white-space:nowrap}
+  nav{position:sticky;top:0;z-index:100;display:flex;gap:2px;padding:10px 26px 0;flex-wrap:wrap;background:rgba(13,18,32,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  nav button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:10px 13px;cursor:pointer;font-size:14px}
+  nav button:hover{color:var(--tx)}
+  nav button.on{color:var(--gold);border-bottom-color:var(--gold)}
+  main{padding:18px 26px 40px;max-width:1300px;margin:0 auto}
+  section{display:none}
+  section.on{display:block}
+  .grid{display:grid;gap:12px}
+  .g5{grid-template-columns:repeat(5,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:1250px){.g5{grid-template-columns:repeat(2,1fr)}.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .lab{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.7px}
+  .kpi .val{font-size:22px;font-weight:600;margin-top:5px}
+  .kpi .note{color:var(--muted);font-size:12px;margin-top:4px}
+  .kpi .note.up{color:var(--green)} .kpi .note.down{color:var(--red)}
+  .card h3{margin:0 0 3px;font-size:15px;font-weight:600}
+  .card .hint{color:var(--muted);font-size:13px;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{position:sticky;top:0;background:var(--panel2);color:var(--muted);font-weight:600;text-align:center;padding:8px 8px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.45px;white-space:nowrap;z-index:2}
+  th[data-s]{cursor:pointer}
+  th[data-s]:hover{color:var(--tx)}
+  th.sorted{color:var(--gold)}
+  td:first-child,th:first-child{text-align:left}
+  td{padding:7px 8px;border-bottom:1px solid rgba(34,48,63,.6);text-align:center;white-space:nowrap}
+  tr:hover td{background:rgba(47,125,255,.06)}
+  tr.drill{cursor:pointer}
+  .tag{display:inline-block;padding:2px 7px;border-radius:6px;font-size:11.5px;border:1px solid}
+  .t-neg{color:var(--green);border-color:rgba(47,209,129,.35);background:rgba(47,209,129,.08)}
+  .t-pos{color:var(--red);border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.08)}
+  .t-mut{color:var(--muted);border-color:var(--line);background:rgba(139,155,176,.07)}
+  .t-warn{color:var(--gold);border-color:rgba(240,185,11,.35);background:rgba(240,185,11,.08)}
+  .pos{color:var(--green)} .neg{color:var(--red)}
+  .scroll{max-height:560px;overflow:auto;border-radius:10px;border:1px solid var(--line)}
+  .toolbar{display:flex;gap:9px;align-items:center;margin-bottom:9px;flex-wrap:wrap}
+  input[type=search],select{background:var(--panel2);border:1px solid var(--line);color:var(--tx);padding:7px 10px;border-radius:8px;font-size:14px;outline:none}
+  input[type=search]:focus,select:focus{border-color:var(--accent)}
+  input[type=search]{min-width:220px}
+  .note-box{background:rgba(47,125,255,.06);border:1px solid rgba(47,125,255,.25);border-radius:10px;padding:12px 14px;color:#c9d7ea;font-size:14px;margin:12px 0}
+  .note-box b{color:var(--tx)}
+  .warn{background:rgba(240,185,11,.06);border-color:rgba(240,185,11,.28)}
+  .insight{border-left:3px solid var(--gold);background:rgba(240,185,11,.05);border-radius:8px;padding:11px 14px;font-size:14px;color:#c9d7ea;margin:8px 0}
+  .insight b{color:var(--tx)}
+  .legend{display:flex;gap:14px;color:var(--muted);font-size:14px;margin-top:8px;flex-wrap:wrap}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px}
+  .small{font-size:12.5px;color:var(--muted)}
+  .chart{width:100%;overflow-x:auto}
+  footer{padding:14px 26px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;margin-top:30px}
+  footer .fmeta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  footer .fmeta span{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:3px 12px;font-size:12px;color:var(--muted)}
+  .guide{background:rgba(240,185,11,.07);border:1px solid rgba(240,185,11,.24);border-left:3px solid var(--gold);border-radius:10px;padding:12px 15px;color:#d9c9a8;font-size:14px;margin:0 0 12px;line-height:1.55}
+  .guide b{color:var(--gold)}
+  .guide .gl{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin:8px 0 2px;display:block}
+  .guide .gl:first-child{margin-top:0}
+  .guide p{margin:2px 0 0}
+  .syn{margin-top:10px;padding:11px 14px;background:rgba(47,125,255,.045);border:1px solid rgba(47,125,255,.16);border-left:3px solid var(--accent);border-radius:9px;color:#c9d7ea;font-size:13.5px;line-height:1.55}
+  .syn b{color:var(--gold)}
+  .syn ul{margin:6px 0 0;padding-left:20px}
+  .syn li{margin:3px 0}
+  .syn li::marker{color:var(--gold)}
+  .lw{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:14px 18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+  .lw .ind{font-size:15px;font-weight:800;letter-spacing:1.5px;padding:7px 16px;border-radius:999px;text-transform:uppercase}
+  .lw .ind.loss{color:#fff;background:var(--red)}
+  .lw .ind.win{color:#fff;background:var(--green)}
+  .lw .m{display:flex;flex-direction:column;gap:3px}
+  .lw .m .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .lw .m .v{font-size:18px;font-weight:700}
+  .tip{position:fixed;background:#1a2536;border:1px solid #33405a;border-radius:8px;padding:8px 12px;font-size:13px;color:var(--tx);pointer-events:none;z-index:200;box-shadow:0 4px 14px rgba(0,0,0,.5);max-width:340px;line-height:1.5;white-space:pre-line;display:none}
+  .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,8,16,.72);display:none;z-index:300;align-items:center;justify-content:center;padding:24px}
+  .modal-overlay.on{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:840px;width:100%;max-height:90vh;overflow:auto;padding:20px 22px;position:relative;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+  .modal .close{position:absolute;top:10px;right:16px;background:transparent;border:0;color:var(--muted);font-size:28px;cursor:pointer;line-height:1;padding:0 6px}
+  .modal .close:hover{color:var(--tx)}
+  .modal .prof-head{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+  .modal .prof-head .nm{font-size:19px;font-weight:700}
+  .modal .prof-head .risk-badge{margin-left:auto}
+  svg [onmousemove]{cursor:crosshair}
+  .dda-title{font-size:17px;font-weight:700;color:var(--tx);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+  .dda-title .num{background:rgba(240,185,11,.15);color:var(--gold);border:1px solid rgba(240,185,11,.4);border-radius:6px;padding:1px 9px;font-size:12px;letter-spacing:.3px}
+  .dda-expl{background:rgba(47,125,255,.05);border:1px solid rgba(47,125,255,.2);border-left:3px solid var(--accent);border-radius:10px;padding:13px 15px;color:#c9d7ea;font-size:14px;line-height:1.6;margin-bottom:12px}
+  .dda-expl b{color:var(--tx)}
+  .dda-expl ul{margin:6px 0 0;padding-left:18px}
+  .dda-expl li{margin:3px 0}
+  .dda-expl li ul{margin:3px 0 4px;padding-left:16px}
+  .dda-expl li li{margin:2px 0;font-size:13.5px;color:#c9d7ea}
+  .dda-expl li li::marker{color:var(--accent)}
+  table .pri-hi{color:var(--red);font-weight:700}
+  table .pri-md{color:var(--gold);font-weight:600}
+  table .pri-lo{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Akij Essentials Ltd — <span>Product Intelligence Cockpit</span></h1>
+    <div class="sub">Price · margin · category momentum · elasticity · declared DP/TP/MRP · channel mix · voice of customer · people · areas · growth — live iBOS ERP + People Desk (BU 144)</div>
+  </div>
+  <div class="badge">FY2022-23 → FY2026-27 (July–June) · clean category window Jul'24–Oct'26</div>
+</header>
+
+<nav id="nav">
+  <button class="on" data-t="ov">Overview</button>
+  <button data-t="price">Price</button>
+  <button data-t="margin">Margin (P&amp;L)</button>
+  <button data-t="sku">All SKUs</button>
+  <button data-t="mom">Category MoM</button>
+  <button data-t="chg">Price change tracker</button>
+  <button data-t="pg">Declared DP/TP/MRP</button>
+  <button data-t="el">Elasticity</button>
+  <button data-t="comp">Competition</button>
+  <button data-t="ms">Market share</button>
+  <button data-t="dealer">Channel &amp; incentives</button>
+  <button data-t="area">Area</button>
+  <button data-t="growth">Growth</button>
+  <button data-t="promo">Promotion</button>
+  <button data-t="voc">Voice of Customer</button>
+  <button data-t="people">People</button>
+  <button data-t="dda">Direction · Decision · Action</button>
+  <button data-t="w2p">Where to Play · Whom to Play · How to Win</button>
+</nav>
+
+<main>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="ov" class="on">
+  <div class="guide"><span class="gl">What this answers</span><p>Your whole essentials business in one screen — revenue, the Q1+October deficit vs budget, price direction and the biggest category moves.</p><span class="gl">How to read it</span><p>KPIs summarise the window. The portfolio chart = monthly revenue (bars) + active categories (line). Breadth = share of categories raising (green) vs cutting (red) realised price vs the prior month. Prices are blended ৳/unit across pack sizes (see the Price tab caveat).</p></div>
+  <div class="grid g5" id="ovKpis"></div>
+  <div class="lw" id="lossWinCard"></div>
+  <div class="card" style="margin-top:12px">
+    <h3>Monthly revenue (৳ Cr) and active categories — Mar'22 → Oct'26</h3>
+    <div class="hint">Bars: net revenue (orders). Line: categories with sales that month. May'25 is a data anomaly (excluded).</div>
+    <div class="chart" id="cPort"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Price direction breadth — Jul'24 → Oct'26</h3>
+    <div class="hint">Share of categories that raised vs cut realised net price vs the previous month (clean window). Green = raises, red = cuts.</div>
+    <div class="chart" id="cBreadth"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>What the full history says</h3>
+    <div id="insights"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Top categories — realised net price journey (Jul'24 → Oct'26)</h3>
+    <div class="hint">First vs last realised net price (৳/unit) in the clean window. Click a row to open its month-on-month view.</div>
+    <div class="scroll" id="cJourney"></div>
+  </div>
+</section>
+
+<!-- ============ PRICE ============ -->
+<section id="price">
+  <div class="guide"><span class="gl">What this answers</span><p>Realised net price per unit by category and over time.</p><span class="gl">How to read it</span><p><b>Net</b> = realised invoice value ÷ quantity. Because AEL sells across mixed pack sizes (1 kg, 25 kg, 1000 kg, tins, litre), the blended category price is <b>directional only</b> — the cleanest series are single-pack categories (Salt, Edible Oil). For a true price read, use the <b>Declared DP/TP/MRP</b> tab, which is per-SKU and per-pack.</p></div>
+  <div class="card">
+    <h3>Realised net price by category — FY2025-26 vs FY2026-27 (৳/unit)</h3>
+    <div class="hint">Average realised net price, blended across pack sizes. Guarded against unit/outlier breaks (median ±5×).</div>
+    <div id="priceTable"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Monthly realised net price — by category (Jul'24 → Oct'26)</h3>
+    <div class="hint">Blended ৳/unit over the clean window. "Overall" = portfolio-weighted; "All categories" overlays every series.</div>
+    <select id="netPriceSel"></select>
+    <div class="chart" id="netPriceChart" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<!-- ============ MARGIN (P&L) ============ -->
+<section id="margin">
+  <div class="guide"><span class="gl">What this answers</span><p>How the whole business stacks up — revenue → COGS → gross profit → opex → financing, by fiscal year.</p><span class="gl">How to read it</span><p>AEL has <b>no SKU-level COGS</b> in the ERP, so margin is reported at business-unit level from the GL journal (the honest, finance-consistent view). GP% is the key metric; financing cost is the largest drag on the bottom line.</p></div>
+  <div class="note-box"><b>Basis:</b> <b>Revenue</b> = Sales Local + Foreign + Wastage (GL 3010001/2/3, net of returns). <b>COGS</b> = GL 4810001. <b>GP%</b> = (revenue − COGS) ÷ revenue. <b>NP%</b> = GP% less selling, logistics, marketing, admin, financing and depreciation. Other income (GL 3010004) shown separately.</div>
+  <div class="grid g4" id="marginKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Price waterfall — FY2026-27 YTD Jul–Oct (৳ Cr)</h3>
+    <div class="chart" id="waterfall"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Revenue vs COGS — GP trend, FY2024-25 → FY2026-27 (Jul–Oct)</h3>
+    <div class="hint">Gross profit is thin but improving: GP% 2.8% (FY24-25) → 3.1% (FY25-26) → 10.7% (FY26-27 YTD Jul–Oct).</div>
+    <div class="chart" id="gpnpTrend"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>P&amp;L by fiscal year (৳ Cr)</h3>
+    <div id="marginTable"></div>
+  </div>
+</section>
+
+<!-- ============ ALL SKUs ============ -->
+<section id="sku">
+  <div class="guide"><span class="gl">What this answers</span><p>Every top SKU — revenue by fiscal year and Q2 (Sep–Oct), in one sortable table.</p><span class="gl">How to read it</span><p>Click any header to sort; use search and the category filter; click a row to drill into its category month-on-month view. AEL carries ~1,000+ SKUs; this shows the top 70 by FY26-27 YTD revenue.</p></div>
+  <div class="grid g5" id="skuKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Every top SKU — revenue summary <span class="small" id="skuCount"></span></h3>
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Search SKU…">
+      <select id="fCat"><option value="all">All categories</option></select>
+    </div>
+    <div class="scroll" id="tSku"></div>
+    <div class="hint" style="margin-top:8px">Click any row to drill into its category month-on-month view. Sort by clicking headers.</div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Top SKU revenue — FY2026-27 YTD (ranked)</h3>
+    <div class="hint">Net sales by SKU, ৳ Cr (Jul–Oct 2026).</div>
+    <div class="chart" id="skuRank"></div>
+  </div>
+</section>
+
+<!-- ============ CATEGORY MONTH-ON-MONTH ============ -->
+<section id="mom">
+  <div class="guide"><span class="gl">What this answers</span><p>One category's revenue and realised price, month by month.</p><span class="gl">How to read it</span><p>Pick a category and range. The chart overlays revenue and realised price; the table adds MoM changes. Click a row in "All SKUs" to jump here (to the SKU's category).</p></div>
+  <div class="card">
+    <h3 id="momTitle">Month-on-month series</h3>
+    <div class="hint">Volume derived as revenue ÷ realised price (units). Compare to the previous month with sales.</div>
+    <div class="toolbar">
+      <select id="momPick"></select>
+      <select id="momRange"><option value="all">Full window (Jul'24–Oct'26)</option><option value="12">Last 12 months</option><option value="6">Last 6 months</option></select>
+    </div>
+    <div class="chart" id="momChart"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Month table</h3>
+    <div class="scroll" id="tMom"></div>
+  </div>
+</section>
+
+<!-- ============ PRICE CHANGE TRACKER ============ -->
+<section id="chg">
+  <div class="guide"><span class="gl">What this answers</span><p>Where prices actually moved — the biggest realised jumps by category.</p><span class="gl">How to read it</span><p>Realised moves are ≥ 20% month-on-month with a unit-typo guard. Because category price is blended across pack sizes, these are directional — pair them with the Declared DP/TP/MRP tab for the per-pack truth.</p></div>
+  <div class="card">
+    <h3>Largest realised price moves <span class="small" id="chc"></span></h3>
+    <div class="hint">Month-on-month realised-price moves ≥ 20% within a category (ratio guard 0.5–2 excludes unit/ERP breaks). Same-month volume change shown. Click a row to drill.</div>
+    <div class="toolbar"><input type="search" id="chq" placeholder="Filter category / month…"></div>
+    <div class="scroll" id="tJump"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Declared price changes (DP / TP) — Jul'26 → Oct'26</h3>
+    <div class="hint">SKUs whose declared Distributor (DP) or Trade (TP) price was revised, with the old → new rate and change date (<code>itm.tblPriceSetup</code>).</div>
+    <div class="scroll" id="tDeclChg"></div>
+  </div>
+</section>
+
+<!-- ============ DECLARED DP/TP/MRP ============ -->
+<section id="pg">
+  <div class="guide"><span class="gl">What this answers</span><p>What AEL has declared for each SKU — the DP / TP / MRP price ladder — and coverage gaps.</p><span class="gl">How to read it</span><p><b>DP</b> = Distributor price (channel 71), <b>TP</b> = Trade/Dealer price (channel 70), <b>MRP</b> = retail list price. This three-level ladder is AEL's price architecture. Realised trade-net should sit between TP and DP — a SKU trading &gt;5% below TP is a discount leak.</p></div>
+  <div class="grid g4" id="pgKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Declared price ladder coverage</h3>
+    <div class="hint">SKUs with a declared DP, TP and MRP. The gap between DP coverage and MRP coverage is the price-architecture gap.</div>
+    <div class="chart" id="cDeclared"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Price-architecture notes (from the AEL price cockpit)</h3>
+    <div id="pgNotes"></div>
+  </div>
+</section>
+
+<!-- ============ ELASTICITY ============ -->
+<section id="el">
+  <div class="guide"><span class="gl">What this answers</span><p>How strongly volume responds to price, category by category.</p><span class="gl">What β means</span><p>β is own-price elasticity — the % change in volume for a 1% change in price. <b>β = −2</b>: a 10% price rise → ~20% volume drop. <b>β &gt; 0</b>: price and volume move together (often supply/seasonality for staples, not demand).</p><span class="gl">How to read it</span><p>Volume is derived (revenue ÷ blended price) and prices are mixed-pack, so β is <b>directional, not a causal demand curve</b>. Staples (salt, oil, flour) should read inelastic; premium rice more elastic.</p></div>
+  <div class="grid g4" id="elKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Elasticity by category (β = Δln volume ÷ Δln price) — Jul'24 → Oct'26</h3>
+    <div class="hint">First-difference estimator over consecutive months. Teal = β&lt;0 (normal). Red = β&gt;0 (anomalous / supply-driven).</div>
+    <div class="chart" id="cEl"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Price vs volume, within category — Jul'24 → Oct'26</h3>
+    <div class="hint">Each point = one category-month; ln(price) and ln(volume) demeaned to the category's own mean. Colour = sign of that category's β.</div>
+    <div class="chart" id="cScatter"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Elasticity table</h3>
+    <div id="tEl"></div>
+    <div class="note-box warn" style="margin-top:10px"><b>Read with care.</b> Volume is derived (revenue ÷ blended price), prices are mixed-pack, and staples demand is supply/seasonality-driven. Treat β as a signal to investigate, not a causal demand curve. The full AEL price cockpit estimates elasticity per-SKU (≈40 usable of ~1,000).</div>
+  </div>
+</section>
+
+<!-- ============ COMPETITION ============ -->
+<section id="comp">
+  <div class="guide"><span class="gl">What this answers</span><p>AEL's marketing firepower vs its staples competitors, and its share position.</p><span class="gl">Coverage</span><p>Competitor digital/offline spend comes from the <b>ARL Competitor Analysis (Dec'25–Feb'26)</b> and <b>Akij Essential Data</b> Google Sheets. The ERP's own pack-price survey (<code>oms.tblCompetitorPriceHeader/Row</code>) is test data — like-for-like pack prices remain a gap.</p></div>
+  <div class="grid g4" id="compKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Competitor digital spend — Dec'25–Feb'26 (৳ Cr)</h3>
+    <div class="hint">AEL spends the least on digital (৳0.35 Cr) — Square spends ~3×, PRAN ~2.3×, MGI ~2.4×.</div>
+    <div class="chart" id="cCompDigital"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Competitor offline spend — Dec'25–Feb'26 (৳ Cr)</h3>
+    <div class="hint">AEL (৳2.5 Cr) is also the lowest offline spender — Square ৳8 Cr, City ৳7 Cr.</div>
+    <div class="chart" id="cCompOffline"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Marketing contribution &amp; digital reach</h3>
+    <div class="scroll" id="compTable"></div>
+  </div>
+</section>
+
+<!-- ============ MARKET SHARE ============ -->
+<section id="ms">
+  <div class="guide"><span class="gl">What this answers</span><p>AEL's share of the Bangladesh staples market (flour, rice, oil, salt, pulses).</p><span class="gl">Coverage</span><p>Market share is <b>external</b> and not in the ERP. AEL's staples compete with Bashundhara, ACI, City Group (Teer), Meghna, Pran and dozens of regional mills.</p></div>
+  <div class="grid g4" id="msKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>AEL market share by category — 2025 (%, log-aware)</h3>
+    <div class="hint">AEL ("Essential") share vs the category leader. Source: Market Share Data H1 2025-26 (Google Sheet).</div>
+    <div class="chart" id="cMsLadder"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Market size &amp; share table — 2025</h3>
+    <div class="scroll" id="msTable"></div>
+  </div>
+</section>
+
+<!-- ============ CHANNEL & INCENTIVES ============ -->
+<section id="dealer">
+  <div class="guide"><span class="gl">What this answers</span><p>How AEL sells — the channel mix — and where trade incentives sit.</p><span class="gl">How to read it</span><p>AEL is <b>bulk-first</b>: ~84% of revenue flows through Bulk / Bulk Flour &amp; Dal / Rice Bulk. Distributor (9%) and Dealer (~0.2%) are the consumer tail. Trade schemes, booked discounts and free goods are AEL's channel levers (no dealer-commission table in this ERP — that lives in <code>arl_erp</code>, which was empty at build time).</p></div>
+  <div class="grid g4" id="commKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Revenue by distribution channel (FY2026-27, ৳ Cr)</h3>
+    <div class="chart" id="commType"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Channel &amp; incentive notes</h3>
+    <div id="incNotes"></div>
+  </div>
+</section>
+
+<!-- ============ AREA ============ -->
+<section id="area">
+  <div class="guide"><span class="gl">What this answers</span><p>Where volume and value land by delivery zone — cumulative across all years.</p><span class="gl">How to read it</span><p>Top zones ranked by cumulative value. Chittagong (the port hub for imported wheat/pulses) dominates by a wide margin, then the Narayanganj/Dhaka industrial belt.</p></div>
+  <div class="card">
+    <h3>Top 16 delivery zones — cumulative value (all years)</h3>
+    <div class="chart" id="zoneBar"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Top zones — value &amp; deliveries (all years)</h3>
+    <div id="zoneTable"></div>
+  </div>
+</section>
+
+<!-- ============ GROWTH ============ -->
+<section id="growth">
+  <div class="guide"><span class="gl">What this answers</span><p>Net revenue by fiscal year (July–June), with delivery counts as an activity proxy.</p><span class="gl">How to read it</span><p>Revenue stepped up strongly in FY2025-26 — this reflects both real volume growth and fuller ERP coverage across the bulk channels. FY2026-27 is a partial year (4 months, Jul–Oct).</p></div>
+  <div class="grid g5" id="growthKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Revenue by fiscal year</h3>
+    <div class="chart" id="revYear"></div>
+  </div>
+</section>
+
+<!-- ============ PROMOTION ============ -->
+<section id="promo">
+  <div class="guide"><span class="gl">What this answers</span><p>Marketing budget/spend vs competitors — offline campaigns, digital spend &amp; reach, social followers, trade incentives, and total spend vs revenue contribution.</p><span class="gl">Coverage</span><p>This tab is <b>external-sheet driven</b>: the SBU marketing-budget sheet, the competitor campaign/analysis sheet and the digital-media-frequency sheet (all Google Sheets).</p></div>
+  <div class="grid g2" id="promoKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Marketing budget vs spend — FY2024-25 → FY2026-27 (৳ Cr, DB-sourced)</h3>
+    <div class="hint">Budget = GL 4210001 in the budget module (<code>bgt</code>); spend = GL 4210001 actual in the journal. Both live from the ERP — the competitor campaign &amp; digital-frequency side is the external part.</div>
+    <div class="chart" id="cMktBudget"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Marketing contribution vs competitors — Dec'25–Feb'26 (% of revenue)</h3>
+    <div class="hint">AEL reinvests ~1.6% of revenue into marketing vs ~2.8% for Square and PRAN — the %-of-revenue lead is the gap to close, not the absolute spend.</div>
+    <div class="chart" id="cMktContribution"></div>
+  </div>
+  <div class="note-box" style="margin-top:12px"><b>Sources.</b> Budget/spend = ERP (GL 4210001). Competitor campaigns &amp; digital frequency = <b>ARL Competitor Analysis</b> + <b>Akij Essential Data</b> Google Sheets (now wired into the Competition tab).</div>
+</section>
+
+<!-- ============ VOICE OF CUSTOMER ============ -->
+<section id="voc">
+  <div class="guide"><span class="gl">What this answers</span><p>Which customers AEL has stopped serving — who, where, how much, and how long since their last order.</p><span class="gl">How to read it</span><p>Activeness = time since the last order (as of Nov 2026): <b>Need attention</b> = no order for 4–5 months (Jun–Jul); <b>Need follow up</b> = no order for 2–3 months (Aug–Sep). Call status / win-back come from the CRM call-back register.</p></div>
+  <div class="grid g4" id="vocKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Lost customer register — activeness (as of Nov'26)</h3>
+    <div class="hint">Last order month + amount, and this FY (Jul–Nov) order amount. Only inactive customers are listed.</div>
+    <div class="toolbar">
+      <select id="vocAct">
+        <option value="all">All activeness</option>
+        <option value="Need attention">Need attention (4–5 mo idle)</option>
+        <option value="Need follow up">Need follow up (2–3 mo idle)</option>
+      </select>
+      <select id="vocSeg">
+        <option value="all">All segments</option>
+        <option value="Dealers (Trade)">Dealers (Trade)</option>
+        <option value="Corporate">Corporate</option>
+        <option value="Sister Concern">Sister Concern</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="scroll" id="vocTable"></div>
+  </div>
+</section>
+
+<!-- ============ PEOPLE ============ -->
+<section id="people">
+  <div class="guide"><span class="gl">What this answers</span><p>The sales officers positioned in the districts that lost revenue — ranked by risk, with click-to-expand KPI profiles.</p><span class="gl">How to read it</span><p>Officers are matched to their district from their employee code (People Desk), then cross-referenced against the idle customers in that district (Voice of Customer) and the division loss (Where to Play). Risk = idle value in their district × idle customer count. Click a row for the full profile.</p></div>
+  <div class="note-box"><b>Method.</b> District is parsed from the employee code (e.g. <code>AEL-Pabna-024</code> → Pabna). "Loss customers" = idle customers in that officer's district (from <code>sms.tblDeliveryHeader</code>). Sales targets are not posted for FY26-27 in the ERP, so the "KPI vs actual" uses the district's Q1 loss as the gap to close.</div>
+  <div class="grid g4" id="peopleKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>District officers — risk-ranked (click to expand)</h3>
+    <div class="hint">Ranked by risk factor (idle value + idle customer count in their district). Click a row to open the KPI profile.</div>
+    <div class="scroll" id="peopleTable"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Recent separations (People Desk, since Jul 2026)</h3>
+    <div class="hint">Attrition is DB-sourced (<code>saas.empEmployeeSeparation</code>) — the resignation trend is a leading indicator of sales-force risk.</div>
+    <div class="scroll" id="peopleSepTable"></div>
+  </div>
+</section>
+
+<!-- ============ DIRECTION · DECISION · ACTION ============ -->
+<section id="dda">
+  <div class="guide"><span class="gl">What this is</span><p>A management read-out — where AEL is heading, what to decide, and what to do — each grounded in the data across the other tabs.</p><span class="gl">How to read it</span><p>Five blocks: <b>Direction</b> (the trend), <b>Decision</b> (the choices), <b>Action</b> (the next moves), <b>Loss-making / at-risk categories</b>, and a <b>Loss Recovery Plan</b>. Each pairs a plain-language explanation with a proof table and a chart.</p></div>
+
+  <div class="dda-title"><span class="num">1</span>Direction — where the business is heading</div>
+  <div class="dda-expl" id="ddaDirExpl"></div>
+  <div class="card"><h3>Chart — revenue trajectory (Mar'22 → Oct'26)</h3><div class="hint">Monthly net revenue (orders). May'25 anomaly excluded.</div><div class="chart" id="ddaDirChart"></div></div>
+  <div class="card" style="margin-top:12px"><h3>Proof</h3><div class="scroll" id="ddaDirTable"></div></div>
+
+  <div class="dda-title"><span class="num">2</span>Decision — what to decide</div>
+  <div class="dda-expl" id="ddaDecExpl"></div>
+  <div class="card"><h3>Chart — where the money is (FY26-27 YTD, Jul–Oct)</h3><div class="hint">Top categories by FY26-27 YTD revenue, coloured by category.</div><div class="chart" id="ddaDecChart"></div></div>
+  <div class="card" style="margin-top:12px"><h3>Proof</h3><div class="scroll" id="ddaDecTable"></div></div>
+
+  <div class="dda-title"><span class="num">3</span>Action — what to do now</div>
+  <div class="dda-expl" id="ddaActExpl"></div>
+  <div class="card"><h3>Chart — Jul–Oct revenue, FY25-26 vs FY26-27</h3><div class="hint">Grouped bars by month — this year vs the prior year.</div><div class="chart" id="ddaActChart"></div></div>
+  <div class="card" style="margin-top:12px"><h3>Proof</h3><div class="scroll" id="ddaActTable"></div></div>
+
+  <div class="dda-title"><span class="num">4</span>Loss-making / at-risk categories</div>
+  <div class="dda-expl" id="ddaLossExpl"></div>
+  <div class="card"><h3>Chart — GP% by fiscal year (business level)</h3><div class="hint">AEL has no SKU-level COGS, so margin is business-level. GP% is the at-risk metric — FY24-25/FY25-26 GP% sits below the ~13.5% break-even gross margin.</div><div class="chart" id="ddaLossChart"></div></div>
+  <div class="card" style="margin-top:12px"><h3>Proof</h3><div class="scroll" id="ddaLossTable"></div></div>
+
+  <div class="dda-title"><span class="num">5</span>Loss Recovery Plan — Q1 FY27 + October (deficit ৳318.3 Cr · Q1 loss ৳20.91 Cr)</div>
+  <div class="dda-expl" id="ddaRecoveryExpl"></div>
+  <div class="card"><h3>Chart — revenue vs budget (Q1 FY27 + October)</h3><div class="hint">The combined Q1 (Jul–Sep) + October shortfall to close: realised revenue vs budget.</div><div class="chart" id="ddaRecoveryChart"></div></div>
+  <div class="card" style="margin-top:12px"><h3>Proof</h3><div class="scroll" id="ddaRecoveryTable"></div></div>
+</section>
+
+<!-- ============ WHERE TO PLAY ============ -->
+<section id="w2p">
+  <div class="guide"><span class="gl">What this answers</span><p>Which divisions/districts AEL lost revenue in during Q1 FY26-27, and a specific recovery playbook.</p><span class="gl">How to read it</span><p>Source: <b>Top10 Loss SBU Details — Essentials tab</b>. "Rev share %" is AEL's revenue distribution by division (the source sheet labels it "Market Share %", but it sums to 100% = AEL's own revenue split, not share vs competitors). The loss (৳ Cr) is the revenue shortfall vs prior quarter.</p></div>
+  <div class="grid g4" id="w2pKpis" style="margin-bottom:12px"></div>
+  <div class="card">
+    <h3>Division loss — Q1 FY26-27 (৳ Cr, log-scale)</h3>
+    <div class="hint">Log scale keeps small districts readable. Gopalganj (−24.36 Cr) is over half of Dhaka's loss.</div>
+    <div class="chart" id="cW2p"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Region loss detail</h3>
+    <div class="scroll" id="w2pTable"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Where to Play · Whom to Play · How to Win</h3>
+    <div id="w2pPlaybook"></div>
+  </div>
+</section>
+
+<!-- ============ METHOD & COVERAGE (hidden) ============ -->
+<section id="mt">
+  <div class="guide"><span class="gl">What this answers</span><p>Where every number comes from and its limits.</p><span class="gl">How to read it</span><p>Check the coverage table before drawing conclusions — some series are partial (competitor, market share, promotion) or derived (blended price, elasticity).</p></div>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Sources</h3>
+      <table>
+        <thead><tr><th>Data</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Revenue, category &amp; SKU series</td><td>iBOSDDD ERP <code>oms.tblSalesOrderRow/Header</code> (BU 144)</td></tr>
+          <tr><td>Declared DP / TP</td><td><code>itm.tblPriceSetup</code> (channels 71 / 70)</td></tr>
+          <tr><td>Declared MRP</td><td><code>rtm.tblRetailPrice</code></td></tr>
+          <tr><td>Channel mix</td><td><code>oms.tblSalesOrderHeader.strDistributionChannelName</code></td></tr>
+          <tr><td>Delivery zones / counts</td><td><code>sms.tblDeliveryHeader</code></td></tr>
+          <tr><td>P&amp;L (revenue, COGS, opex, financing)</td><td><code>fin.tblAccountingJournal</code> (GL map below)</td></tr>
+          <tr><td>Revenue budget (deficit) + marketing budget</td><td><code>bgt.tblBudgetIncomeExpenseRow</code> (GL 3010001/2 · 4210001)</td></tr>
+          <tr><td>Q1 bottom-line loss (EAT)</td><td>AR SBU Top-line &amp; Bottom-line Scorecard</td></tr>
+          <tr><td>Lost customers (VOC)</td><td><code>sms.tblDeliveryHeader</code> set-difference (Jul–Oct 2025 vs 2026)</td></tr>
+          <tr><td>Sales roster + attrition (People)</td><td>People Desk <code>peopledesk_arl/saas.empEmployeeBasicInfo</code> + <code>empEmployeeSeparation</code></td></tr>
+          <tr><td>Competitor prices</td><td><code>oms.tblCompetitorPriceHeader/Row</code> (May–Dec 2024, test/stale)</td></tr>
+          <tr><td>Market share / campaigns / KPI-vs-Lost / CRM</td><td>external — not in any DB</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Method</h3>
+      <ul style="margin-left:16px;font-size:14px;color:#c9d7ea">
+        <li><b>Revenue</b> = <code>numNetValue</code> (orders), ৳ Cr. Deficit revenue uses the GL journal (net of returns) to match the flash-report metric.</li>
+        <li><b>Category</b> = keyword classifier on <code>strItemName</code> (Atta/Maida, Wheat bulk, Bran, Lentils &amp; Pulses, Rice × 4, Edible Oil, Salt, by-products).</li>
+        <li><b>Realised net price</b> = revenue ÷ quantity (blended across pack sizes — directional only).</li>
+        <li><b>GP%</b> = (revenue − COGS) ÷ revenue, GL-level. <b>Break-even gross margin ≈ 13.5%</b> of revenue.</li>
+        <li><b>Elasticity β</b> = OLS slope of Δln(volume) on Δln(price); gated at ≥8 pairs, |β| ≤ 5, R² ≥ 0.10, price dispersion ≥ 2%.</li>
+        <li><b>Price moves</b> = |Δ| ≥ 20% MoM with ratio guard 0.5–2.</li>
+        <li><b>Fiscal year</b> = July–June; label = start year (FY2026-27 = "2026").</li>
+        <li><b>GL map:</b> revenue 3010001/2/3 · COGS 4810001 · manufacturing 4010001 · selling 4310001 · logistics 4410001 · marketing 4210001 · admin 4110001 · financial 4510001 · depreciation 4610001 · other income 3010004 (excluded from revenue).</li>
+        <li><b>No SKU-level COGS</b> — per-SKU margin / a true loss-making list is not published; the price-realisation screen is used instead.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Coverage</h3>
+    <table>
+      <thead><tr><th>Series</th><th>Window</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Monthly total revenue</td><td>Mar'22 → Oct'26</td><td><span class="tag t-neg">Full</span></td></tr>
+        <tr><td>Category revenue / price</td><td>Jul'24 → Oct'26</td><td><span class="tag t-neg">Full (clean)</span></td></tr>
+        <tr><td>Top SKU revenue</td><td>FY25-26 + FY26-27 YTD</td><td><span class="tag t-neg">Top 70</span></td></tr>
+        <tr><td>Declared DP/TP/MRP</td><td>point-in-time</td><td><span class="tag t-warn">Snapshot</span></td></tr>
+        <tr><td>P&amp;L (GL)</td><td>FY24-25 → FY26-27</td><td><span class="tag t-warn">GL posting from FY24-25</span></td></tr>
+        <tr><td>Delivery zones</td><td>all years</td><td><span class="tag t-neg">Full</span></td></tr>
+        <tr><td>Budget (deficit)</td><td>Q1 FY27 + Oct</td><td><span class="tag t-warn">Oct GL subject to final posting</span></td></tr>
+        <tr><td>Lost customers</td><td>Jul–Oct 2025 vs 2026</td><td><span class="tag t-neg">Full (ERP)</span> · <span class="tag t-mut">CRM pending</span></td></tr>
+        <tr><td>Sales roster + attrition</td><td>point-in-time</td><td><span class="tag t-neg">Full (People Desk)</span> · <span class="tag t-mut">risk scores pending</span></td></tr>
+        <tr><td>Competitor prices</td><td>May–Dec 2024</td><td><span class="tag t-mut">Test / stale</span></td></tr>
+        <tr><td>Market share / promotion / w2p</td><td>—</td><td><span class="tag t-mut">External / not provided</span></td></tr>
+        <tr><td>Elasticity (β)</td><td>Jul'24 → Oct'26</td><td><span class="tag t-warn">Derived volume</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="fmeta">
+    <span>Business Unit: Akij Essentials Ltd (AEL · ERP 144)</span>
+    <span>Source: iBOSDDD live ERP + People Desk (read-only)</span>
+    <span>Pattern: SBU Product Intelligence Cockpit</span>
+    <span>Fiscal years: July–June · FY2022-23 → FY2026-27 (4 mo)</span>
+    <span>Generated: Nov 2026</span>
+  </div>
+  <div class="small">Comprehensive 18-tab cockpit for Akij Essentials — price, GP/NP, category momentum, elasticity, declared DP/TP/MRP, channel mix, voice of customer, people, area and growth, plus the Direction · Decision · Action read-out. Every figure comes from the live iBOSDDD + People Desk extract (BU 144 · AEL).</div>
+</footer>
+<div class="modal-overlay" id="profModal"><div class="modal" id="profModalBody"></div></div>
+<div id="tip" class="tip"></div>
+
+<script>
+var D = /*__D__*/;
+
+/* ============ helpers ============ */
+function cr(v){ if(v==null||isNaN(v))return"—"; var c=v; if(c>=100)return "৳ "+Math.round(c).toLocaleString("en-US")+" Cr"; if(c>=10)return "৳ "+c.toFixed(0)+" Cr"; return "৳ "+c.toFixed(1)+" Cr"; }
+function taka(v){ if(v==null||isNaN(v))return"—"; return "৳ "+Math.round(v).toLocaleString("en-US"); }
+function unt(v){ if(v==null||isNaN(v)||!isFinite(v))return"—"; if(v>=1e8)return (v/1e7).toFixed(1)+" Cr"; if(v>=1e5)return (v/1e5).toFixed(1)+" L"; if(v>=1e3)return (v/1e3).toFixed(0)+" k"; return Math.round(v).toLocaleString("en-US"); }
+function pct(a,b){ if(!b)return null; return (a-b)/b*100; }
+function pf(v){ if(v==null||isNaN(v))return "—"; return (v>=0?"+":"")+v.toFixed(1)+"%"; }
+function mn(m){ return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1]; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+var TIP=document.getElementById("tip");
+window.tip=function(ev,text){ TIP.innerHTML=text; TIP.style.display="block"; var x=ev.clientX+16,y=ev.clientY+16; if(x+340>innerWidth)x=ev.clientX-340; if(y+150>innerHeight)y=ev.clientY-150; TIP.style.left=x+"px"; TIP.style.top=y+"px"; };
+window.untip=function(){ TIP.style.display="none"; };
+window.syn=function(id, bullets){
+  var el=document.getElementById(id); if(!el) return;
+  var h='<div class="syn"><b>SMART synopsis</b><ul>';
+  bullets.forEach(function(b){ h+='<li>'+b+'</li>'; });
+  h+='</ul></div>';
+  el.insertAdjacentHTML("afterend", h);
+};
+
+/* ============ derived window series ============ */
+var WINLAB = D.labels;
+var CATS = D.cats;
+var N = WINLAB.length;
+var winVol = {};
+CATS.forEach(function(k){ winVol[k] = WINLAB.map(function(_,i){ var r=D.catRev[k][i], p=D.catNetP[k][i]; return (r!=null && p!=null && p>0) ? r*1e7/p : null; }); });
+var winRevTotal = WINLAB.map(function(_,i){ var s=0,any=false; CATS.forEach(function(k){var v=D.catRev[k][i]; if(v!=null){s+=v;any=true;}}); return any?s:null; });
+var winVolTotal = WINLAB.map(function(_,i){ var s=0,any=false; CATS.forEach(function(k){var v=winVol[k][i]; if(v!=null){s+=v;any=true;}}); return any?s:null; });
+var priceOverallNet = WINLAB.map(function(_,i){ var r=0,q=0; CATS.forEach(function(k){var v=D.catRev[k][i],p=D.catNetP[k][i]; if(v!=null&&p!=null&&p>0){ r+=v*1e7; q+=v*1e7/p; } }); return q>0 ? r/q : null; });
+
+function elasticity(pArr, vArr){
+  var xs=[], ys=[];
+  for(var i=1;i<pArr.length;i++){
+    var p1=pArr[i-1],p2=pArr[i],v1=vArr[i-1],v2=vArr[i];
+    if(p1==null||p2==null||v1==null||v2==null||p1<=0||p2<=0||v1<=0||v2<=0) continue;
+    var dp=Math.log(p2/p1), dq=Math.log(v2/v1);
+    if(!isFinite(dp)||!isFinite(dq)) continue;
+    xs.push(dp); ys.push(dq);
+  }
+  var n=xs.length; if(n<8) return null;
+  var mx=0,my=0; xs.forEach(function(x){mx+=x;}); ys.forEach(function(y){my+=y;}); mx/=n; my/=n;
+  var sxy=0,sxx=0,syy=0;
+  for(var i=0;i<n;i++){ var dx=xs[i]-mx, dy=ys[i]-my; sxy+=dx*dy; sxx+=dx*dx; syy+=dy*dy; }
+  if(sxx===0) return null;
+  var b=sxy/sxx; if(Math.abs(b)>5) return null;
+  var r2 = syy>0 ? (sxy*sxy)/(sxx*syy) : 0;
+  var ps=[]; pArr.forEach(function(v){ if(v!=null&&v>0) ps.push(v); });
+  var mnv=Math.min.apply(null,ps), mxv=Math.max.apply(null,ps);
+  if(mnv<=0 || (mxv-mnv)/mnv < 0.02) return null;
+  return {b:b, r2:r2, n:n};
+}
+var EL = {};
+CATS.forEach(function(k){ EL[k]=elasticity(D.catNetP[k], winVol[k]); });
+var OVEL = elasticity(priceOverallNet, winVolTotal);
+
+var JUMPS=[];
+CATS.forEach(function(k){
+  var p=D.catNetP[k], v=winVol[k];
+  for(var i=1;i<p.length;i++){
+    var a=p[i-1], b=p[i];
+    if(a==null||b==null||a<=0) continue;
+    var ratio=b/a; if(ratio<0.5||ratio>2) continue;
+    var ch=(b-a)/a*100;
+    if(Math.abs(ch)>=20) JUMPS.push({sku:k, idx:i, from:a, to:b, ch:ch, vol: v[i]!=null&&v[i-1]!=null&&v[i-1]>0 ? (v[i]-v[i-1])/v[i-1]*100 : null});
+  }
+});
+JUMPS.sort(function(x,y){return Math.abs(y.ch)-Math.abs(x.ch);});
+
+/* ============ SVG chart engine ============ */
+var NS="http://www.w3.org/2000/svg";
+function el(t,a){ var e=document.createElementNS(NS,t); for(var k in a) e.setAttribute(k,a[k]); return e; }
+function txt(x,y,s,o){ var t=el("text",{x:x,y:y,fill:o&&o.fill||"#5d6c8f","font-size":o&&o.size||"12.5", "text-anchor":o&&o.anchor||"middle"}); t.textContent=s; return t; }
+var C={line:"#26314f",axis:"#33406a",tx:"#e6ecff",muted:"#8fa0c4",bg:"#0d1220"};
+
+function lineChart(container, series, labels, opts){
+  opts=opts||{}; var W=920,H=300,L=64,R=14,T=14,B=36;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  var vals=[]; series.forEach(function(s){s.data.forEach(function(v){if(v!=null&&!isNaN(v))vals.push(v);});});
+  var min=Math.min.apply(null,vals), max=Math.max.apply(null,vals);
+  if(opts.min!=null)min=opts.min; if(opts.max!=null)max=opts.max;
+  if(min===max){min-=1;max+=1;}
+  var pad=(max-min)*0.08; if(opts.pad!==false){min-=pad;max+=pad;}
+  var x0=L,x1=W-R,y0=T,y1=H-B;
+  function X(i){return x0+(i/(labels.length-1))*(x1-x0);}
+  function Y(v){return y1-(v-min)/(max-min)*(y1-y0);}
+  var steps=5; for(var g=0;g<=steps;g++){ var v=min+(max-min)*g/steps; var yy=Y(v);
+    svg.appendChild(el("line",{x1:x0,y1:yy,x2:x1,y2:yy,stroke:C.line,"stroke-width":1}));
+    svg.appendChild(txt(x0-7,yy+3,(opts.yfmt||fmtY)(v),{anchor:"end"}));
+  }
+  svg.appendChild(el("line",{x1:x0,y1:y0,x2:x0,y2:y1,stroke:C.axis,"stroke-width":1}));
+  svg.appendChild(el("line",{x1:x0,y1:y1,x2:x1,y2:y1,stroke:C.axis,"stroke-width":1}));
+  if(opts.ytitle){ var yt=txt(14,(y0+y1)/2,opts.ytitle,{anchor:"middle",fill:C.muted,size:"12.5"}); yt.setAttribute("transform","rotate(-90 14 "+(y0+y1)/2+")"); svg.appendChild(yt); }
+  var colors=opts.colors||["#2f7dff","#22c3aa","#f0b90b","#ff5c7a","#ff8a3d","#a78bfa","#2fd181"];
+  series.forEach(function(s,si){
+    var col=colors[si%colors.length];
+    var d="", open=false;
+    s.data.forEach(function(v,i){ if(v==null||isNaN(v)){ open=false; return; } d+=(open?"L":"M")+X(i).toFixed(1)+","+Y(v).toFixed(1); open=true; });
+    svg.appendChild(el("path",{d:d,fill:"none",stroke:col,"stroke-width":s.w||2.2,"stroke-opacity":.95,"stroke-dasharray":s.dash||""}));
+    if(opts.dots!==false) s.data.forEach(function(v,i){ if(v!=null&&!isNaN(v)){
+      svg.appendChild(el("circle",{cx:X(i),cy:Y(v),r:2.6,fill:col,stroke:C.bg,"stroke-width":1}));
+      svg.appendChild(el("circle",{cx:X(i),cy:Y(v),r:8,fill:"transparent",onmousemove:"tip(event,'"+esc(s.name)+"<br>"+labels[i]+": "+esc((opts.tipfmt||opts.yfmt||fmtY)(v))+"')",onmouseout:"untip()"}));
+    } });
+  });
+  var step=Math.max(1,Math.ceil(labels.length/13));
+  labels.forEach(function(lb,i){ if(i%step===0||i===labels.length-1) svg.appendChild(txt(X(i),H-12,lb,{size:"12"})); });
+  if(series.length>1) legend(container,series,colors);
+  return svg;
+}
+function legend(container,series,colors){
+  var h='<div class="legend">'; series.forEach(function(s,i){ h+='<span><i style="background:'+colors[i%colors.length]+'"></i>'+esc(s.name)+'</span>'; }); h+='</div>';
+  container.insertAdjacentHTML("beforeend",h);
+}
+function fmtY(v){ if(v>=100) return Math.round(v)+"Cr"; if(v>=1) return v.toFixed(0)+"Cr"; return v.toFixed(1)+"Cr"; }
+function fmtTk(v){ return "৳"+Math.round(v); }
+function ffill(a){ var last=null; for(var i=0;i<a.length;i++){ if(a[i]==null){ a[i]=last; } else { last=a[i]; } } return a; }
+var ALLC=["#f0b90b","#2f7dff","#22c3aa","#ff5c7a","#ff8a3d","#a78bfa","#2fd181","#7fb0ff","#ff9ecb","#9be8d8","#e6ecff","#8fa0c4"];
+
+function dualLineChart(container, s1, s2, labels, opts){
+  opts=opts||{}; var W=920,H=300,L=64,R=64,T=14,B=36;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  function mm(arr){ var f=arr.filter(function(v){return v!=null&&!isNaN(v);}); var mn2=Math.min.apply(null,f), mx2=Math.max.apply(null,f); if(mn2===mx2){mn2-=1;mx2+=1;} var p=(mx2-mn2)*0.08; return [mn2-p, mx2+p]; }
+  var m1=mm(s1.data), m2=mm(s2.data);
+  var min1=m1[0],max1=m1[1],min2=m2[0],max2=m2[1];
+  var x0=L,x1=W-R,y0=T,y1=H-B;
+  function X(i){return x0+(i/(labels.length-1))*(x1-x0);}
+  function Y1(v){return y1-(v-min1)/(max1-min1)*(y1-y0);}
+  function Y2(v){return y1-(v-min2)/(max2-min2)*(y1-y0);}
+  var steps=5;
+  for(var g=0;g<=steps;g++){ var v=min1+(max1-min1)*g/steps; var yy=Y1(v);
+    svg.appendChild(el("line",{x1:x0,y1:yy,x2:x1,y2:yy,stroke:C.line,"stroke-width":1}));
+    svg.appendChild(txt(x0-7,yy+3,(opts.yfmt||fmtY)(v),{anchor:"end"}));
+  }
+  for(var g=0;g<=steps;g++){ var v=min2+(max2-min2)*g/steps; var yy=Y2(v);
+    svg.appendChild(txt(x1+7,yy+3,(opts.y2fmt||fmtY)(v),{anchor:"start",fill:C.muted}));
+  }
+  svg.appendChild(el("line",{x1:x0,y1:y0,x2:x0,y2:y1,stroke:C.axis,"stroke-width":1}));
+  svg.appendChild(el("line",{x1:x0,y1:y1,x2:x1,y2:y1,stroke:C.axis,"stroke-width":1}));
+  svg.appendChild(el("line",{x1:x1,y1:y0,x2:x1,y2:y1,stroke:C.axis,"stroke-width":1}));
+  function drawSeries(s,color,Y){
+    var d="", open=false;
+    s.data.forEach(function(v,i){ if(v==null||isNaN(v)){open=false;return;} d+=(open?"L":"M")+X(i).toFixed(1)+","+Y(v).toFixed(1); open=true; });
+    svg.appendChild(el("path",{d:d,fill:"none",stroke:color,"stroke-width":s.w||2.2,"stroke-opacity":.95}));
+    if(opts.dots!==false) s.data.forEach(function(v,i){ if(v!=null&&!isNaN(v)){
+      svg.appendChild(el("circle",{cx:X(i),cy:Y(v),r:2.4,fill:color,stroke:C.bg,"stroke-width":1}));
+      svg.appendChild(el("circle",{cx:X(i),cy:Y(v),r:8,fill:"transparent",onmousemove:"tip(event,'"+esc(s.name)+"<br>"+labels[i]+": "+esc((opts.tipfmt||opts.yfmt||fmtY)(v))+"')",onmouseout:"untip()"}));
+    } });
+  }
+  drawSeries(s1,opts.c1||"#22c3aa",Y1);
+  drawSeries(s2,opts.c2||"#2f7dff",Y2);
+  var step=Math.max(1,Math.ceil(labels.length/13));
+  labels.forEach(function(lb,i){ if(i%step===0||i===labels.length-1) svg.appendChild(txt(X(i),H-12,lb,{size:"12"})); });
+  var h='<div class="legend"><span><i style="background:'+(opts.c1||"#22c3aa")+'"></i>'+esc(s1.name)+' (left)</span><span><i style="background:'+(opts.c2||"#2f7dff")+'"></i>'+esc(s2.name)+' (right)</span></div>';
+  container.insertAdjacentHTML("beforeend",h);
+  return svg;
+}
+function barChart(container, items, opts){
+  opts=opts||{}; var W=920,H=Math.max(240,items.length*26+40),L=190,R=10,T=12,B=12;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  var max=0; items.forEach(function(i){max=Math.max(max,i.value);});
+  var y0=T,y1=H-B,x0=L,x1=W-R; var bh=(y1-y0)/items.length;
+  items.forEach(function(it,idx){
+    var bw=Math.max(2,(it.value/max)*(x1-x0));
+    var yy=y0+idx*bh+4;
+    svg.appendChild(el("rect",{x:x0,y:yy,width:bw,height:bh-8,rx:3,fill:it.color||"#2f7dff"}));
+    svg.appendChild(txt(x0-8,yy+bh/2-4,it.label.length>24?it.label.slice(0,23)+"…":it.label,{anchor:"end",fill:C.muted,size:"12.5"}));
+    svg.appendChild(txt(x0+bw+5,yy+bh/2-4,(opts.fmt||String)(it.value),{anchor:"start",fill:C.tx,size:"12.5"}));
+  });
+  return svg;
+}
+function groupedBar(container, categories, series, opts){
+  opts=opts||{}; var W=920,H=320,L=64,R=14,T=14,B=44;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  var max=0; series.forEach(function(s){s.data.forEach(function(v){max=Math.max(max,v);});});
+  var x0=L,x1=W-R,y0=T,y1=H-B;
+  var step=5; for(var g=0;g<=step;g++){ var v=max*g/step; var yy=y1-(v/max)*(y1-y0);
+    svg.appendChild(el("line",{x1:x0,y1:yy,x2:x1,y2:yy,stroke:C.line,"stroke-width":1}));
+    svg.appendChild(txt(x0-7,yy+3,(opts.yfmt||fmtY)(v),{anchor:"end"}));
+  }
+  svg.appendChild(el("line",{x1:x0,y1:y0,x2:x0,y2:y1,stroke:C.axis,"stroke-width":1}));
+  svg.appendChild(el("line",{x1:x0,y1:y1,x2:x1,y2:y1,stroke:C.axis,"stroke-width":1}));
+  var colors=opts.colors||["#2f7dff","#22c3aa","#f0b90b"];
+  var gw=(x1-x0)/categories.length;
+  categories.forEach(function(c,ci){
+    var n=series.length, bw=gw*0.7/n;
+    series.forEach(function(s,si){
+      var v=s.data[ci]; var bh=(v/max)*(y1-y0);
+      var xx=x0+ci*gw+gw*0.15+si*bw;
+      svg.appendChild(el("rect",{x:xx,y:y1-bh,width:bw-2,height:bh,rx:1,fill:colors[si%colors.length]}));
+    });
+    svg.appendChild(txt(x0+ci*gw+gw*0.5,y1+14,c,{size:"12.5"}));
+  });
+  legend(container,series,colors);
+  return svg;
+}
+function overlayBarLine(container, labels, bars, line, opts){
+  opts=opts||{}; var W=920,H=300,L=64,R=52,T=14,B=36;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  var maxB=Math.max.apply(null,bars), maxL=Math.max.apply(null,line)*1.15;
+  var x0=L,x1=W-R,y0=T,y1=H-B;
+  var gw=(x1-x0)/labels.length;
+  var steps=4; for(var g=0;g<=steps;g++){ var v=maxB*g/steps; var yy=y1-(v/maxB)*(y1-y0);
+    svg.appendChild(el("line",{x1:x0,y1:yy,x2:x1,y2:yy,stroke:C.line,"stroke-width":1}));
+    svg.appendChild(txt(x0-7,yy+3,(opts.yfmt||fmtY)(v),{anchor:"end"}));
+  }
+  for(var g=0;g<=steps;g++){ var v=maxL*g/steps; svg.appendChild(txt(x1+6,y1-(v/maxL)*(y1-y0)+3,Math.round(v),{anchor:"start",fill:C.muted,size:"12"})); }
+  svg.appendChild(el("line",{x1:x0,y1:y1,x2:x1,y2:y1,stroke:C.axis,"stroke-width":1}));
+  bars.forEach(function(v,i){
+    var bh=(v/maxB)*(y1-y0);
+    svg.appendChild(el("rect",{x:x0+i*gw+gw*0.18,y:y1-bh,width:gw*0.64,height:Math.max(1,bh),rx:1.5,fill:opts.barColor||"#2f7dff","fill-opacity":.85,onmousemove:"tip(event,'"+labels[i]+"<br>"+(opts.barName||"Revenue")+": "+esc((opts.tipfmt||opts.yfmt||fmtY)(v))+"')",onmouseout:"untip()"}));
+  });
+  var d=""; line.forEach(function(v,i){ d+=(i?"L":"M")+(x0+i*gw+gw/2).toFixed(1)+","+(y1-(v/maxL)*(y1-y0)).toFixed(1); });
+  svg.appendChild(el("path",{d:d,fill:"none",stroke:opts.lineColor||"#22c3aa","stroke-width":2}));
+  line.forEach(function(v,i){ svg.appendChild(el("circle",{cx:x0+i*gw+gw/2,cy:y1-(v/maxL)*(y1-y0),r:4,fill:opts.lineColor||"#22c3aa",stroke:C.bg,"stroke-width":1,onmousemove:"tip(event,'"+labels[i]+"<br>"+(opts.lineName||"Line")+": "+Math.round(v)+"')",onmouseout:"untip()"})); });
+  var step=Math.max(1,Math.ceil(labels.length/13));
+  labels.forEach(function(lb,i){ if(i%step===0||i===labels.length-1) svg.appendChild(txt(x0+i*gw+gw/2,H-12,lb,{size:"12"})); });
+  legend(container,[{name:opts.barName||"Bars"},{name:opts.lineName||"Line"}],[opts.barColor||"#2f7dff",opts.lineColor||"#22c3aa"]);
+  return svg;
+}
+function breadthChart(container, labels, upPct, dnPct){
+  var W=920,H=260,L=44,R=14,T=16,B=34;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  var x0=L,x1=W-R,yc=T+(H-T-B)/2, half=(H-T-B)/2;
+  svg.appendChild(el("line",{x1:x0,y1:yc,x2:x1,y2:yc,stroke:C.axis,"stroke-width":1}));
+  [0.25,0.5,0.75].forEach(function(f){
+    svg.appendChild(el("line",{x1:x0,y1:yc-half*f,x2:x1,y2:yc-half*f,stroke:C.line,"stroke-dasharray":"2,4"}));
+    svg.appendChild(el("line",{x1:x0,y1:yc+half*f,x2:x1,y2:yc+half*f,stroke:C.line,"stroke-dasharray":"2,4"}));
+    svg.appendChild(txt(x0-6,yc-half*f+3,(f*100)+"%",{anchor:"end",size:"11.5"}));
+    svg.appendChild(txt(x0-6,yc+half*f+3,-(f*100)+"%",{anchor:"end",size:"11.5"}));
+  });
+  var gw=(x1-x0)/labels.length;
+  labels.forEach(function(lb,i){
+    var u=upPct[i]||0, dn=dnPct[i]||0;
+    if(u>0) svg.appendChild(el("rect",{x:x0+i*gw+gw*0.2,y:yc-half*u,width:gw*0.6,height:Math.max(1,half*u),rx:1.5,fill:"#2fd181","fill-opacity":.85}));
+    if(dn>0) svg.appendChild(el("rect",{x:x0+i*gw+gw*0.2,y:yc,width:gw*0.6,height:Math.max(1,half*dn),rx:1.5,fill:"#ff5c7a","fill-opacity":.85}));
+  });
+  var step=Math.max(1,Math.ceil(labels.length/13));
+  labels.forEach(function(lb,i){ if(i%step===0) svg.appendChild(txt(x0+i*gw+gw/2,H-10,lb,{size:"12"})); });
+  legend(container,[{name:"Categories raising price"},{name:"Categories cutting price"}],["#2fd181","#ff5c7a"]);
+  return svg;
+}
+function divergingBars(container, rows, opts){
+  opts=opts||{}; var W=920,H=Math.max(240,rows.length*22+46),L=170,R=52,T=22,B=24;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  var maxAbs=0; rows.forEach(function(r){ maxAbs=Math.max(maxAbs,Math.abs(r.value||0)); });
+  if(maxAbs<=0)maxAbs=1;
+  var x0=L,x1=W-R,xc=x0+(x1-x0)/2,hw=(x1-x0)/2;
+  svg.appendChild(el("line",{x1:xc,y1:T-8,x2:xc,y2:H-B,stroke:C.axis,"stroke-width":1}));
+  svg.appendChild(txt(xc,T-12,"0",{size:"11.5"}));
+  var bh=(H-T-B)/rows.length;
+  rows.forEach(function(r,i){
+    if(r.value==null){ svg.appendChild(txt(x0-8,T+i*bh+bh/2-3,r.label,{anchor:"end",fill:C.muted,size:"12.5"})); svg.appendChild(txt(xc,T+i*bh+bh/2-3,"n/a",{anchor:"start",fill:C.dim,size:"12.5"})); return; }
+    var bw=(Math.abs(r.value)/maxAbs)*hw;
+    var xx=r.value>=0?xc:xc-bw;
+    var col=r.value<0?"#22c3aa":"#ff5c7a";
+    var tipText = opts.tip ? opts.tip(r) : (esc(r.label)+"<br>"+r.value.toFixed(2)+(opts.suffix||""));
+    svg.appendChild(el("rect",{x:xx,y:T+i*bh+4,width:Math.max(1.5,bw),height:bh-8,rx:2,fill:col,"fill-opacity":r.strong?0.95:0.6,onmousemove:"tip(event,'"+tipText+"')",onmouseout:"untip()"}));
+    svg.appendChild(txt(x0-8,T+i*bh+bh/2-3,r.label.length>24?r.label.slice(0,23)+"…":r.label,{anchor:"end",fill:C.muted,size:"12.5"}));
+    svg.appendChild(txt(r.value>=0?xx+bw+5:xx-5,T+i*bh+bh/2-3,r.value.toFixed(2)+(opts.suffix||""),{anchor:r.value>=0?"start":"end",fill:C.tx,size:"12.5"}));
+  });
+  return svg;
+}
+function scatterChart(container, groups){
+  var W=920,H=360,L=64,R=20,T=22,B=56;
+  var svg=el("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H,preserveAspectRatio:"xMinYMin meet"});
+  container.innerHTML=""; container.appendChild(svg);
+  var xs=[],ys=[];
+  groups.forEach(function(g){ g.pts.forEach(function(p){ xs.push(p[0]); ys.push(p[1]); }); });
+  if(!xs.length){ return; }
+  var xmin=Math.min.apply(null,xs),xmax=Math.max.apply(null,xs),ymin=Math.min.apply(null,ys),ymax=Math.max.apply(null,ys);
+  var px=(xmax-xmin)*0.08||1, py=(ymax-ymin)*0.08||1;
+  xmin-=px;xmax+=px;ymin-=py;ymax+=py;
+  var x0=L,x1=W-R,y0=T,y1=H-B;
+  function X(v){return x0+(v-xmin)/(xmax-xmin)*(x1-x0);}
+  function Y(v){return y1-(v-ymin)/(ymax-ymin)*(y1-y0);}
+  for(var g2=0;g2<=4;g2++){ var v=xmin+(xmax-xmin)*g2/4; svg.appendChild(el("line",{x1:X(v),y1:y0,x2:X(v),y2:y1,stroke:C.line,"stroke-width":.6})); svg.appendChild(txt(X(v),H-30,v.toFixed(2),{size:"11.5"})); }
+  for(var g3=0;g3<=4;g3++){ var v2=ymin+(ymax-ymin)*g3/4; svg.appendChild(el("line",{x1:x0,y1:Y(v2),x2:x1,y2:Y(v2),stroke:C.line,"stroke-width":.6})); svg.appendChild(txt(x0-7,Y(v2)+3,v2.toFixed(2),{anchor:"end",size:"11.5"})); }
+  svg.appendChild(el("line",{x1:X(0),y1:y0,x2:X(0),y2:y1,stroke:C.axis,"stroke-width":1}));
+  svg.appendChild(el("line",{x1:x0,y1:Y(0),x2:x1,y2:Y(0),stroke:C.axis,"stroke-width":1}));
+  svg.appendChild(txt(x0+8,y0+12,"price up + volume up → supply-driven",{anchor:"start",fill:C.dim,size:"11"}));
+  svg.appendChild(txt(x1-8,y0+12,"price up + volume down → normal",{anchor:"end",fill:C.dim,size:"11"}));
+  function quad(x,y){
+    if(x>0.004&&y<0) return "price up + volume down → normal demand";
+    if(x< -0.004&&y>0) return "price down + volume up → normal demand";
+    if(x>0.004&&y>0) return "price up + volume up → supply-driven";
+    if(x< -0.004&&y<0) return "price down + volume down → unusual, investigate";
+    return "near zero — little movement";
+  }
+  groups.forEach(function(g){
+    g.pts.forEach(function(p){
+      var tt="<b>"+esc(g.name)+"</b><br>Δln price "+p[0].toFixed(3)+"<br>Δln volume "+p[1].toFixed(3)+"<br>"+quad(p[0],p[1]);
+      svg.appendChild(el("circle",{cx:X(p[0]),cy:Y(p[1]),r:2.6,fill:g.color,"fill-opacity":g.op||0.6,onmousemove:"tip(event,'"+tt+"')",onmouseout:"untip()"}));
+    });
+  });
+  svg.appendChild(txt((x0+x1)/2,H-12,"Δ ln price (per-category demeaned)",{size:"12.5",fill:C.muted}));
+  var yt=txt(14,(y0+y1)/2,"Δ ln volume",{anchor:"middle",fill:C.muted,size:"12.5"}); yt.setAttribute("transform","rotate(-90 14 "+(y0+y1)/2+")"); svg.appendChild(yt);
+  legend(container,[{name:"β < 0 (normal)"},{name:"β > 0 (anomalous)"}],["#22c3aa","#ff5c7a"]);
+  return svg;
+}
+function skuSelector(selId, chartId, map, overallArr, labels, ytitle, opts){
+  opts=opts||{};
+  var keys=Object.keys(map);
+  keys.forEach(function(k){ ffill(map[k]); });
+  var sel=document.getElementById(selId);
+  ["Overall (total)","All categories (compare)"].concat(keys).forEach(function(o){ var op=document.createElement("option"); op.value=o; op.textContent=o; sel.appendChild(op); });
+  function draw(){
+    var c=document.getElementById(chartId);
+    var yf=opts.yfmt||fmtTk;
+    if(sel.value==="Overall (total)"){
+      lineChart(c,[{name:opts.overallName||"Overall",data:overallArr}],labels,{ytitle:ytitle,yfmt:yf,colors:[opts.overallColor||"#2f7dff"]});
+    } else if(sel.value==="All categories (compare)"){
+      lineChart(c,keys.map(function(k){return {name:k,data:map[k],w:1.3};}),labels,{ytitle:ytitle,yfmt:yf,colors:ALLC});
+    } else {
+      lineChart(c,[{name:sel.value,data:map[sel.value]}],labels,{ytitle:ytitle,yfmt:yf,colors:[opts.skuColor||"#f0b90b"]});
+    }
+  }
+  sel.addEventListener("change",draw);
+  draw();
+}
+
+/* ============ tabs + deep-link ============ */
+var TABS=["ov","price","margin","sku","mom","chg","pg","el","comp","ms","dealer","area","growth","promo","voc","people","dda","w2p"];
+function showTab(t){
+  if(TABS.indexOf(t)<0) t="ov";
+  TABS.forEach(function(id){ document.getElementById(id).classList.toggle("on", id===t); });
+  [].forEach.call(document.querySelectorAll("#nav button"),function(b){ b.classList.toggle("on", b.getAttribute("data-t")===t); });
+  if(location.hash.slice(1)!==t) history.replaceState(null,"","#"+t);
+  window.scrollTo(0,0);
+}
+[].forEach.call(document.querySelectorAll("#nav button"),function(b){ b.addEventListener("click",function(){ showTab(b.getAttribute("data-t")); }); });
+window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1)); });
+
+/* ============ OVERVIEW ============ */
+(function(){
+  var y25=D.yearlyRev[2025], y24=D.yearlyRev[2024];
+  var activeCats = WINLAB.map(function(_,i){ var s=0; CATS.forEach(function(k){ if(D.catRev[k][i]>0) s++; }); return s; });
+  var mlab=D.monthly.map(function(m){return mn(m[1])+"'"+String(m[0]).slice(2);});
+  var mrev=D.monthly.map(function(m){return m[2];});
+  var upPct=[],dnPct=[];
+  for(var i=1;i<WINLAB.length;i++){
+    var up=0,dn=0,n=0;
+    CATS.forEach(function(k){ var a=D.catNetP[k][i-1],b=D.catNetP[k][i]; if(a==null||b==null) return; n++; if(b>a)up++; else if(b<a)dn++; });
+    upPct.push(n?up/n:0); dnPct.push(n?dn/n:0);
+  }
+  upPct.unshift(null); dnPct.unshift(null);
+  var betas=CATS.map(function(k){return EL[k];}).filter(Boolean).map(function(e){return e.b;}).sort(function(a,b){return a-b;});
+  var medB=betas.length?betas[Math.floor(betas.length/2)]:null;
+  var lastUp=upPct[upPct.length-1], lastDn=dnPct[dnPct.length-1];
+  var k=[
+    {l:"FY2025-26 Net Sales",v:cr(y25),n:pf(pct(y25,y24))+" vs FY2024-25",c:pct(y25,y24)>=0?"up":"down"},
+    {l:"FY2026-27 YTD (Jul–Oct)",v:cr(D.yearlyRev[2026]),n:"4 months · partial year"},
+    {l:"Categories tracked",v:CATS.length,n:"flour · rice · pulses · oil · salt"},
+    {l:"Median elasticity β",v:medB==null?"—":medB.toFixed(2),n:betas.length+" of "+CATS.length+" categories measurable"},
+    {l:"Price direction (Oct'26)",v:(lastUp*100).toFixed(0)+"% up",n:(lastDn*100).toFixed(0)+"% of categories cut price"}
+  ];
+  document.getElementById("ovKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||'')+'">'+x.n+'</div></div>';}).join("");
+
+  (function(){
+    var df=D.deficit, loss=D.sbu.loss;
+    var isDeficit=df.deficit>0;
+    var h='<div class="ind '+(isDeficit?'loss':'win')+'">'+(isDeficit?'Deficit':'Surplus')+'</div>';
+    h+='<div class="m"><div class="l">Q1 FY27 + October revenue vs budget</div><div class="v '+(isDeficit?'neg':'pos')+'">'+(isDeficit?'−':'+')+'৳'+Math.abs(df.deficit).toFixed(1)+' Cr <span style="font-size:12px;color:var(--muted)">(৳'+df.comb_act.toFixed(1)+' Cr vs ৳'+df.comb_bud.toFixed(1)+' Cr budget)</span></div></div>';
+    h+='<div class="m"><div class="l">Q1 bottom-line loss (EAT)</div><div class="v neg">−৳'+Math.abs(loss).toFixed(2)+' Cr <span style="font-size:12px;color:var(--muted)">(budget NP ৳'+D.sbu.budget_np.toFixed(1)+' Cr)</span></div></div>';
+    h+='<div class="m"><div class="l">Q1 achievement</div><div class="v" style="font-size:14px;color:var(--muted)">'+(df.q1_act/df.q1_bud*100).toFixed(0)+'% (Q1) · '+(df.oct_act/df.oct_bud*100).toFixed(0)+'% (Oct)</div></div>';
+    document.getElementById("lossWinCard").innerHTML=h;
+  })();
+
+  overlayBarLine(document.getElementById("cPort"),mlab,mrev,activeCats,{yfmt:fmtY,ytitle:"Revenue (৳ Cr)",barName:"Net revenue",lineName:"Active categories",tipfmt:cr});
+  breadthChart(document.getElementById("cBreadth"),WINLAB.slice(1),upPct.slice(1),dnPct.slice(1));
+
+  var elNeg=betas.filter(function(b){return b<-1;}).length, elIn=betas.filter(function(b){return b>=-1&&b<=0;}).length, elPos=betas.filter(function(b){return b>0;}).length;
+  var gp26=D.pnl[2026], gp25=D.pnl[2025];
+  var gpPct26=(gp26.rev-gp26.cogs)/gp26.rev*100, gpPct25=(gp25.rev-gp25.cogs)/gp25.rev*100;
+  var ins=[
+    ["Q1 FY27 + October opened in a ৳"+D.deficit.deficit.toFixed(1)+" Cr revenue deficit (৳"+D.deficit.comb_act.toFixed(1)+" Cr vs ৳"+D.deficit.comb_bud.toFixed(1)+" Cr budget), with a Q1 bottom-line loss of −৳"+D.sbu.loss.toFixed(2)+" Cr.","October (410 Cr budget vs 131 Cr actual) is the bulk of the gap — supply shortages (lentils, chickpeas, Miniket paddy), a deliberate go-slow in AMS and salt-supply disruption per the Q1 scorecard."],
+    ["Gross margin is recovering: GP% "+gpPct25.toFixed(1)+"% (FY25-26) → "+gpPct26.toFixed(1)+"% (FY26-27 YTD), but financing cost (৳"+gp26.fin.toFixed(0)+" Cr YTD) is the real bottom-line drag.","Break-even gross margin is ≈13.5% of revenue — the current run-rate must hold above it to turn EAT positive."],
+    ["AEL is bulk-first: Bulk + Bulk Flour &amp; Dal + Rice Bulk ≈ 84% of channel revenue; Distributor is ~9% and Dealer ~0.2%.","The consumer brand is a small share of the top line — the staples portfolio is fundamentally a B2B bulk business."],
+    ["Chittagong (the port hub for imported wheat/pulses) is the single biggest delivery zone (৳2,045 Cr), ~3× the next zone.","Import-led supply concentrates AEL's physical footprint around Chittagong port."],
+    [elNeg+" categories price-elastic (β&lt;−1), "+elIn+" inelastic, "+elPos+" anomalous (β&gt;0).","Staples read anomalous or inelastic because volume is supply/seasonality-driven, not price-driven — treat β as directional."],
+    ["FY2025-26 revenue ৳"+cr(y25)+" is ~2× FY2024-25 (৳"+cr(y24)+"), but this also reflects fuller ERP coverage across bulk channels.","Read the growth step-up as real growth + better data capture — see the Price/Method caveats."]
+  ];
+  document.getElementById("insights").innerHTML=ins.map(function(p){
+    return '<div class="insight"><b>'+p[0]+'</b><br><span class="small">'+p[1]+'</span></div>';}).join("");
+
+  function catLast(k){ for(var i=D.catNetP[k].length-1;i>=0;i--){ if(D.catNetP[k][i]!=null) return D.catNetP[k][i]; } return null; }
+  function catFirst(k){ for(var i=0;i<D.catNetP[k].length;i++){ if(D.catNetP[k][i]!=null) return D.catNetP[k][i]; } return null; }
+  var jrows=CATS.slice().sort(function(a,b){ return (catLast(b)==null?-1:catLast(b))-(catLast(a)==null?-1:catLast(a)); });
+  var th='<table><thead><tr><th>Category</th><th>Price Jul\'24</th><th>Price Oct\'26</th><th>Move</th><th>Rev Oct\'26</th><th>β</th></tr></thead><tbody>';
+  jrows.forEach(function(k){
+    var first=catFirst(k), last=catLast(k);
+    var mv=(first!=null&&last!=null)?(last-first)/first*100:null;
+    th+='<tr class="drill" onclick="openMom(\''+esc(k)+'\')"><td><b>'+esc(k)+'</b></td><td>'+taka(first)+'</td><td>'+taka(last)+'</td>';
+    th+='<td class="'+(mv==null?"":mv>=0?"pos":"neg")+'">'+(mv==null?"—":pf(mv))+'</td>';
+    th+='<td>'+cr(D.catRev[k][N-1])+'</td>';
+    th+='<td>'+(EL[k]?EL[k].b.toFixed(2):'<span class="tag t-mut">n/a</span>')+'</td></tr>';
+  });
+  th+='</tbody></table>';
+  document.getElementById("cJourney").innerHTML=th;
+})();
+
+/* ============ PRICE ============ */
+(function(){
+  function avg(arr){ var s=[],i; for(i=0;i<arr.length;i++) if(arr[i]!=null) s.push(arr[i]); if(!s.length) return null; return s.reduce(function(a,b){return a+b;},0)/s.length; }
+  function last(arr){ for(var i=arr.length-1;i>=0;i--) if(arr[i]!=null) return arr[i]; return null; }
+  var html='<table><thead><tr><th>Category</th><th>FY25-26 avg (৳/unit)</th><th>FY26-27 avg (৳/unit)</th><th>Latest Oct\'26</th><th>Δ FY</th></tr></thead><tbody>';
+  CATS.forEach(function(k){
+    var p=D.catNetP[k];
+    var a25=avg(p.slice(12,24)), a26=avg(p.slice(24));
+    var d = (a25!=null&&a26!=null)? (a26-a25)/a25*100 : null;
+    html+='<tr><td><b>'+esc(k)+'</b></td><td>'+(a25!=null?taka(a25):"—")+'</td><td>'+(a26!=null?taka(a26):"—")+'</td><td>'+taka(last(p))+'</td><td class="'+(d==null?"":d>=0?"pos":"neg")+'">'+(d==null?"—":pf(d))+'</td></tr>';
+  });
+  html+='</tbody></table><div class="small" style="margin-top:8px">Blended realised price (revenue ÷ quantity) across pack sizes — directional only. See the Declared DP/TP/MRP tab for per-SKU, per-pack prices.</div>';
+  document.getElementById("priceTable").innerHTML=html;
+  skuSelector("netPriceSel","netPriceChart",D.catNetP,priceOverallNet,D.labels,"৳ / unit",{yfmt:fmtTk,overallName:"Overall realised price"});
+})();
+
+/* ============ MARGIN (P&L) ============ */
+(function(){
+  var p26=D.pnl[2026], p25=D.pnl[2025], p24=D.pnl[2024];
+  function gp(p){ return p.rev-p.cogs; }
+  function gpPct(p){ return (p.rev-p.cogs)/p.rev*100; }
+  var k=[
+    {l:"FY2026-27 YTD GP%",v:gpPct(p26).toFixed(1)+"%",n:"vs "+gpPct(p25).toFixed(1)+"% FY25-26",c:"up"},
+    {l:"Break-even gross margin",v:"≈13.5%",n:"of revenue"},
+    {l:"Financing cost YTD",v:cr(p26.fin),n:"the largest drag on EAT",c:"down"},
+    {l:"Q1 loss (EAT)",v:"−৳20.91 Cr",n:"scorecard · budget NP −৳10.54 Cr",c:"down"}
+  ];
+  document.getElementById("marginKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  var items=[
+    {label:"Revenue (Jul–Oct)",value:p26.rev,color:"#2f7dff"},
+    {label:"COGS (4810001)",value:p26.cogs,color:"#ff5c7a"},
+    {label:"Gross profit",value:gp(p26),color:"#2fd181"}
+  ];
+  barChart(document.getElementById("waterfall"),items,{fmt:cr});
+  groupedBar(document.getElementById("gpnpTrend"),["FY2024-25","FY2025-26","FY2026-27*"],[
+    {name:"Revenue",data:[p24.rev,p25.rev,p26.rev]},
+    {name:"COGS",data:[p24.cogs,p25.cogs,p26.cogs]}
+  ],{yfmt:fmtY,colors:["#2f7dff","#ff5c7a"]});
+  var html='<table><thead><tr><th>Line (৳ Cr)</th><th>FY2024-25</th><th>FY2025-26</th><th>FY2026-27 YTD</th></tr></thead><tbody>';
+  [["Revenue",p24,p25,p26,"rev"],["COGS",p24,p25,p26,"cogs"],["Gross profit",p24,p25,p26,"gp"],["Selling",p24,p25,p26,"selling"],["Logistics",p24,p25,p26,"log"],["Marketing",p24,p25,p26,"mkt"],["Admin",p24,p25,p26,"adm"],["Financing",p24,p25,p26,"fin"],["Depreciation",p24,p25,p26,"dep"],["Other income",p24,p25,p26,"other"]].forEach(function(r){
+    var label=r[0], a=r[1], b=r[2], c=r[3], key=r[4];
+    function v(p,k2){ if(k2==="gp") return p.rev-p.cogs; return p[k2]; }
+    html+='<tr><td><b>'+label+'</b></td><td>'+cr(v(a,key))+'</td><td>'+cr(v(b,key))+'</td><td>'+cr(v(c,key))+'</td></tr>';
+  });
+  html+='<tr style="border-top:2px solid var(--line)"><td><b>GP%</b></td><td class="pos">'+gpPct(p24).toFixed(1)+'%</td><td class="pos">'+gpPct(p25).toFixed(1)+'%</td><td class="pos">'+gpPct(p26).toFixed(1)+'%</td></tr>';
+  html+='</tbody></table><div class="small" style="margin-top:8px">GL journal (net of returns). Other income (GL 3010004) shown separately and excluded from revenue. *FY26-27 = Jul–Oct, not annualised.</div>';
+  document.getElementById("marginTable").innerHTML=html;
+})();
+
+/* ============ ALL SKUs ============ */
+(function(){
+  var fCat=document.getElementById("fCat");
+  CATS.forEach(function(c){ var o=document.createElement("option"); o.value=c; o.textContent=c; fCat.appendChild(o); });
+  var byCat={}; D.sku.forEach(function(s){ byCat[s[1]]=(byCat[s[1]]||0)+s[3]; });
+  var topCat=CATS.slice().sort(function(a,b){return (byCat[b]||0)-(byCat[a]||0);})[0];
+  var tot26=D.sku.reduce(function(a,s){return a+s[3];},0);
+  var k=[
+    {l:"Top SKU",v:D.sku[0][0],n:cr(D.sku[0][3])+" FY26-27 YTD"},
+    {l:"Top category",v:topCat,n:cr(byCat[topCat]||0)+" of top-70 revenue"},
+    {l:"Top-70 share",v:(tot26/(D.yearlyRev[2026])*100).toFixed(0)+"%",n:"of FY26-27 YTD revenue"},
+    {l:"SKUs shown",v:D.sku.length,n:"of ~1,000+ active SKUs"},
+    {l:"Consumer (1 kg/500 g)",v:"~25",n:"retail packs in the top 70"}
+  ];
+  document.getElementById("skuKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val" style="font-size:16px;word-break:break-word">'+x.v+'</div><div class="note">'+x.n+'</div></div>';}).join("");
+
+  var ST={sort:"f26",dir:-1,q:"",cat:"all"};
+  function renderSku(){
+    var rows=D.sku.map(function(s){return {n:s[0],c:s[1],f25:s[2],f26:s[3],q2:s[4],grow:(s[3]-s[2])/s[2]*100};})
+      .filter(function(r){ if(ST.cat!=="all"&&r.c!==ST.cat) return false; if(ST.q&&r.n.toLowerCase().indexOf(ST.q.toLowerCase())<0) return false; return true; });
+    rows.sort(function(a,b){ var x=a[ST.sort], y=b[ST.sort]; if(typeof x==="string") return x.localeCompare(y)*ST.dir; return (x-y)*ST.dir; });
+    document.getElementById("skuCount").textContent="· "+rows.length+" of "+D.sku.length+" top SKUs";
+    function th(key,label){ return '<th data-s="'+key+'"'+(ST.sort===key?' class="sorted"':'')+'>'+label+(ST.sort===key?(ST.dir<0?" ↓":" ↑"):"")+'</th>'; }
+    var h='<table><thead><tr>'+th("n","SKU")+th("c","Category")+th("f25","FY25-26 rev")+th("f26","FY26-27 YTD")+th("q2","Q2 (Sep–Oct)")+th("grow","YoY")+'</tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr class="drill" onclick="openMom(\''+esc(r.c)+'\')">';
+      h+='<td><b>'+esc(r.n)+'</b></td><td>'+esc(r.c)+'</td>';
+      h+='<td>'+cr(r.f25)+'</td><td>'+cr(r.f26)+'</td><td>'+cr(r.q2)+'</td>';
+      h+='<td class="'+(r.grow>=0?"pos":"neg")+'">'+pf(r.grow)+'</td></tr>';
+    });
+    h+='</tbody></table>';
+    document.getElementById("tSku").innerHTML=h;
+    [].forEach.call(document.querySelectorAll("#tSku th[data-s]"),function(t){
+      t.addEventListener("click",function(){ var s=t.getAttribute("data-s"); if(ST.sort===s) ST.dir*=-1; else { ST.sort=s; ST.dir=-1; } renderSku(); });
+    });
+  }
+  document.getElementById("q").addEventListener("input",function(){ ST.q=this.value; renderSku(); });
+  fCat.addEventListener("change",function(){ ST.cat=this.value; renderSku(); });
+  renderSku();
+  barChart(document.getElementById("skuRank"),D.sku.slice(0,20).map(function(s){return {label:s[0],value:s[3]};}),{fmt:cr});
+})();
+
+/* ============ CATEGORY MONTH-ON-MONTH ============ */
+(function(){
+  var sel=document.getElementById("momPick");
+  ["Overall (total)"].concat(CATS).forEach(function(o){ var op=document.createElement("option"); op.value=o; op.textContent=o; sel.appendChild(op); });
+  window.openMom=function(cat){
+    var val = (CATS.indexOf(cat)<0 && cat!=="Overall (total)") ? "Overall (total)" : cat;
+    sel.value = CATS.indexOf(val)>=0 ? val : "Overall (total)";
+    showTab("mom"); renderMom();
+  };
+  function renderMom(){
+    var isAll=sel.value==="Overall (total)";
+    var key=isAll?null:sel.value;
+    document.getElementById("momTitle").textContent=(isAll?"Overall (total)":key)+" — month-on-month";
+    var rng=document.getElementById("momRange").value;
+    var p=key?D.catNetP[key]:priceOverallNet, v=key?winVol[key]:winVolTotal, r=key?D.catRev[key]:winRevTotal;
+    var n=rng==="all"?p.length:Math.min(+rng,p.length);
+    var s=p.length-n;
+    var labs=WINLAB.slice(s), pp=p.slice(s), vv=v.slice(s), rr=r.slice(s);
+    dualLineChart(document.getElementById("momChart"),
+      {name:"Volume (units)",data:vv.map(function(x){return x==null?0:x;}),w:2},
+      {name:"Net price (৳/unit)",data:pp.map(function(x){return x==null?0:x;})},
+      labs,{yfmt:unt,y2fmt:fmtTk,ytitle:"Volume",y2title:"৳/unit",c1:"#2f7dff",c2:"#f0b90b"});
+    var h='<table><thead><tr><th>Month</th><th>Revenue</th><th>Net price</th><th>Δ price</th><th>Vol (derived)</th><th>Δ vol</th></tr></thead><tbody>';
+    var prev=null;
+    for(var i=0;i<labs.length;i++){
+      var dp=null,dv=null;
+      if(prev!=null&&pp[i]!=null&&prev.p!=null&&prev.p>0) dp=(pp[i]-prev.p)/prev.p*100;
+      if(prev!=null&&vv[i]!=null&&prev.v!=null&&prev.v>0) dv=(vv[i]-prev.v)/prev.v*100;
+      h+='<tr><td>'+labs[i]+'</td><td>'+cr(rr[i])+'</td><td>'+taka(pp[i])+'</td>';
+      h+='<td class="'+(dp==null?"":dp>=0?"pos":"neg")+'">'+(dp==null?"—":pf(dp))+'</td>';
+      h+='<td>'+unt(vv[i])+'</td>';
+      h+='<td class="'+(dv==null?"":dv>=0?"pos":"neg")+'">'+(dv==null?"—":pf(dv))+'</td></tr>';
+      if(pp[i]!=null||rr[i]>0) prev={p:pp[i],v:vv[i]};
+    }
+    h+='</tbody></table>';
+    document.getElementById("tMom").innerHTML=h;
+  }
+  sel.addEventListener("change",renderMom);
+  document.getElementById("momRange").addEventListener("change",renderMom);
+  sel.value="Flour (Atta/Maida)";
+  renderMom();
+})();
+
+/* ============ PRICE CHANGE TRACKER ============ */
+(function(){
+  function jumpRows(list){
+    var h='<table><thead><tr><th>Category</th><th>Month</th><th>From</th><th>To</th><th>Δ price</th><th>Δ volume (same mo)</th></tr></thead><tbody>';
+    list.slice(0,150).forEach(function(j){
+      h+='<tr class="drill" onclick="openMom(\''+esc(j.sku)+'\')"><td><b>'+esc(j.sku)+'</b></td><td>'+WINLAB[j.idx]+'</td>';
+      h+='<td>'+taka(j.from)+'</td><td>'+taka(j.to)+'</td>';
+      h+='<td class="'+(j.ch>=0?"pos":"neg")+'"><b>'+pf(j.ch)+'</b></td>';
+      h+='<td class="'+(j.vol==null?"":j.vol>=0?"pos":"neg")+'">'+(j.vol==null?"—":pf(j.vol))+'</td></tr>';
+    });
+    return h+'</tbody></table>';
+  }
+  function renderJ(){
+    var qq=document.getElementById("chq").value.toLowerCase();
+    var list=JUMPS.filter(function(j){ return !qq||j.sku.toLowerCase().indexOf(qq)>=0||WINLAB[j.idx].toLowerCase().indexOf(qq)>=0; });
+    document.getElementById("chc").textContent="· "+list.length+" moves (≥20%, showing top 150)";
+    document.getElementById("tJump").innerHTML=jumpRows(list);
+  }
+  document.getElementById("chq").addEventListener("input",renderJ);
+  renderJ();
+  // declared price changes
+  var dc = D.declaredChanges || [];
+  var dh='<table><thead><tr><th>SKU</th><th>Rate</th><th>Old (৳)</th><th>New (৳)</th><th>Change</th><th>Date</th></tr></thead><tbody>';
+  dc.forEach(function(r){
+    dh+='<tr><td><b>'+esc(r[0])+'</b></td><td><span class="tag '+(r[1]==="DP"?"t-neg":"t-warn")+'">'+r[1]+'</span></td><td>'+taka(r[2])+'</td><td>'+taka(r[3])+'</td>';
+    if(r[5]==null) dh+='<td><span class="tag t-mut">new</span></td>';
+    else dh+='<td class="'+(r[5]>=0?"pos":"neg")+'">'+(r[5]>=0?"+":"")+r[5]+'%</td>';
+    dh+='<td>'+esc(r[4])+'</td></tr>';
+  });
+  if(!dc.length) dh+='<tr><td colspan="6" style="color:var(--muted)">No declared price changes in Jul–Oct 2026.</td></tr>';
+  dh+='</tbody></table><div class="small" style="margin-top:8px">'+dc.length+' declared DP/TP revisions in Jul–Oct 2026. These are the "rate-card" moves — pair them with the realised moves above to separate price architecture from execution.</div>';
+  document.getElementById("tDeclChg").innerHTML=dh;
+})();
+
+/* ============ DECLARED DP/TP/MRP ============ */
+(function(){
+  var dp=D.declared.dp, tp=D.declared.tp, mrp=D.declared.mrp;
+  var k=[
+    {l:"Declared DP (Distributor)",v:dp+" SKUs",n:"itm.tblPriceSetup · channel 71"},
+    {l:"Declared TP (Trade/Dealer)",v:tp+" SKUs",n:"itm.tblPriceSetup · channel 70"},
+    {l:"Declared MRP",v:mrp+" SKUs",n:"rtm.tblRetailPrice"},
+    {l:"DP without MRP gap",v:(dp-mrp)+" SKUs",n:"consumer SKUs lacking a list price",c:"down"}
+  ];
+  document.getElementById("pgKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  barChart(document.getElementById("cDeclared"),[
+    {label:"Declared DP (Distributor price)",value:dp,color:"#2f7dff"},
+    {label:"Declared TP (Trade/Dealer price)",value:tp,color:"#22c3aa"},
+    {label:"Declared MRP (retail list)",value:mrp,color:"#f0b90b"}
+  ],{fmt:function(v){return v+" SKUs";}});
+  document.getElementById("pgNotes").innerHTML=
+    '<div class="note-box"><b>Three-level ladder.</b> AEL prices through DP (distributor) → TP (trade/dealer) → MRP (retail). Realised trade-net should sit between TP and DP. The DP ('+dp+') vs MRP ('+mrp+') gap means '+(dp-mrp)+' consumer SKUs sell with no declared retail list price.</div>'+
+    '<div class="note-box warn"><b>Discount leak check.</b> The AEL price cockpit flags ~10 trade SKUs trading &gt;5% below their declared TP — a margin leak to close. Re-run the realised-vs-declared screen monthly to keep the ladder honest.</div>'+
+    '<div class="insight"><b>Why it matters.</b> With GP% at ~10.7% and break-even at ~13.5%, every point of discount below TP goes straight to the bottom line. Enforcing the declared ladder is the single fastest margin lever.</div>';
+})();
+
+/* ============ ELASTICITY ============ */
+(function(){
+  function elasticityRead(b, r2, n){
+    if(b==null) return "Not measurable — needs at least 8 valid month-over-month pairs with real price variation. Many staples categories are too intermittent or too flat to estimate.";
+    var fit = (r2==null) ? "" : (r2<0.10 ? "Weak fit (R² "+r2.toFixed(2)+") — treat as a direction only." : (r2<0.30 ? "Moderate fit (R² "+r2.toFixed(2)+")." : "Strong fit (R² "+r2.toFixed(2)+")."));
+    var head, body;
+    if(b>0){ head="β = +"+b.toFixed(2)+" — anomalous (positive)"; body="Price and volume move in the SAME direction. For staples this is usually supply/seasonality (a cost push or a harvest cycle), not a demand response."; }
+    else if(b<-1){ head="β = "+b.toFixed(2)+" — elastic"; body="Volume reacts more than price: a 10% price rise → ~"+Math.abs(b*10).toFixed(0)+"% volume DROP, so revenue FALLS. Hike with caution."; }
+    else { head="β = "+b.toFixed(2)+" — inelastic"; body="Volume is sticky to price: a 10% price rise only trims volume ~"+Math.abs(b*10).toFixed(0)+"%, so revenue RISES. There is price headroom."; }
+    return head+"<br>"+body+(fit?"<br>"+fit:"")+(n?"<br>Based on "+n+" month-pairs.":"");
+  }
+  function r2Read(r2){ return "R² = "+r2.toFixed(2)+" — how much of the month-to-month volume variation the price move explains."+(r2<0.10?" Weak fit: treat β as a direction only.":(r2<0.30?" Moderate fit.":" Strong fit.")); }
+  var meas=0, neg=0, inel=0, anom=0;
+  CATS.forEach(function(k){ var e=EL[k]; if(!e) return; meas++; if(e.b<-1)neg++; else if(e.b<=0)inel++; else anom++; });
+  var k=[
+    {l:"Categories measurable",v:meas+" / "+CATS.length,n:"≥8 month-pairs, |β|≤5, R²≥0.10"},
+    {l:"Elastic (β < −1)",v:neg,n:"price up → volume falls more"},
+    {l:"Inelastic (−1 … 0)",v:inel,n:"headroom to hold or raise price"},
+    {l:"Anomalous (β > 0)",v:anom,n:"supply / seasonality driven"}
+  ];
+  document.getElementById("elKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note">'+x.n+'</div></div>';}).join("");
+  var rows=CATS.map(function(key){ return {label:key, value:EL[key]?EL[key].b:null, strong:EL[key]?EL[key].r2>0.2:false}; })
+    .sort(function(a,b){ return (b.value==null?-99:b.value)-(a.value==null?-99:a.value); });
+  divergingBars(document.getElementById("cEl"),rows,{tip:function(r){ var e=EL[r.label]; return "<b>"+esc(r.label)+"</b><br>"+elasticityRead(e?e.b:null, e?e.r2:null, e?e.n:0); }});
+  var groups=[];
+  CATS.forEach(function(key){
+    var e=EL[key]; if(!e) return;
+    var pArr=D.catNetP[key], vArr=winVol[key], raw=[];
+    for(var i=1;i<pArr.length;i++){
+      var p1=pArr[i-1],p2=pArr[i],v1=vArr[i-1],v2=vArr[i];
+      if(p1==null||p2==null||v1==null||v2==null||p1<=0||p2<=0||v1<=0||v2<=0) continue;
+      raw.push([Math.log(p2/p1),Math.log(v2/v1)]);
+    }
+    if(raw.length<8) return;
+    var mx=0,my=0; raw.forEach(function(r){mx+=r[0];my+=r[1];}); mx/=raw.length; my/=raw.length;
+    var pts=raw.map(function(r){ return [r[0]-mx, r[1]-my]; });
+    groups.push({name:key, pts:pts, color:e.b<0?"#22c3aa":"#ff5c7a", op:e.r2>0.2?0.8:0.45});
+  });
+  scatterChart(document.getElementById("cScatter"),groups);
+  var h='<table><thead><tr><th>Category</th><th>β (first-diff)</th><th>R²</th><th>Pairs</th><th>Read</th></tr></thead><tbody>';
+  CATS.forEach(function(key){
+    var e=EL[key];
+    h+='<tr class="drill" onclick="openMom(\''+esc(key)+'\')"><td><b>'+esc(key)+'</b></td>';
+    if(!e){
+      var nt="Not measurable — needs at least 8 valid month-over-month pairs with real price variation. This category's price is mostly flat (or sells too intermittently) to estimate a reliable slope.";
+      h+='<td>—</td><td>—</td><td>—</td><td><span class="tag t-mut">not measurable</span></td></tr>';
+      return;
+    }
+    var full=elasticityRead(e.b,e.r2,e.n);
+    var read=e.b<-1 ? "elastic" : (e.b<=0 ? "inelastic" : "pass-through");
+    var readClass=e.b<-1 ? "t-warn" : (e.b<=0 ? "t-neg" : "t-pos");
+    h+='<td onmousemove="tip(event,\''+full+'\')" onmouseout="untip()">'+e.b.toFixed(2)+'</td>';
+    h+='<td onmousemove="tip(event,\''+r2Read(e.r2)+'\')" onmouseout="untip()">'+e.r2.toFixed(2)+'</td>';
+    h+='<td onmousemove="tip(event,\''+e.n+' month-over-month pairs used in the regression.\')" onmouseout="untip()">'+e.n+'</td>';
+    h+='<td onmousemove="tip(event,\''+full+'\')" onmouseout="untip()"><span class="tag '+readClass+'">'+read+'</span></td></tr>';
+  });
+  if(OVEL) h+='<tr style="background:rgba(240,185,11,.06)"><td><b>Overall (blended)</b></td><td>'+OVEL.b.toFixed(2)+'</td><td>'+OVEL.r2.toFixed(2)+'</td><td>'+OVEL.n+'</td><td>portfolio signal</td></tr>';
+  h+='</tbody></table>';
+  document.getElementById("tEl").innerHTML=h;
+})();
+
+/* ============ COMPETITION ============ */
+(function(){
+  var dig = (D.ext && D.ext.compDigital) || [];
+  var off = (D.ext && D.ext.compOffline) || [];
+  var cont = (D.ext && D.ext.mktContribution) || [];
+  var ael = dig.filter(function(r){ return r[0]==="Akij Essential"; })[0];
+  var maxDig = dig.slice().sort(function(a,b){return b[1]-a[1];})[0];
+  var aelTotal = (ael?ael[1]:0) + (off.filter(function(r){return r[0]==="Akij Essential";})[0]||[0,0])[1];
+  var maxTotal = 0; off.forEach(function(r){ maxTotal = Math.max(maxTotal, r[1]); });
+  var k=[
+    {l:"AEL digital spend",v:"৳"+(ael?ael[1].toFixed(2):"—")+" Cr",n:"lowest of 6 tracked",c:"down"},
+    {l:"Top digital spender",v:maxDig[0],n:"৳"+maxDig[1].toFixed(2)+" Cr · "+(maxDig[1]/ael[1]).toFixed(1)+"× AEL"},
+    {l:"AEL digital reach",v:(ael?ael[2].toFixed(1):"—")+"M",n:"vs "+maxDig[2].toFixed(1)+"M top (Square)"},
+    {l:"AEL offline spend",v:"৳2.5 Cr",n:"lowest; Square ৳8 Cr, City ৳7 Cr",c:"down"}
+  ];
+  document.getElementById("compKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  barChart(document.getElementById("cCompDigital"), dig.map(function(r){return {label:r[0], value:r[1], color:r[0]==="Akij Essential"?"#f0b90b":"#2f7dff"};}), {fmt:function(v){return "৳"+v.toFixed(2)+" Cr";}});
+  barChart(document.getElementById("cCompOffline"), off.map(function(r){return {label:r[0], value:r[1], color:r[0]==="Akij Essential"?"#f0b90b":"#2f7dff"};}), {fmt:function(v){return "৳"+v.toFixed(1)+" Cr";}});
+  var h='<table><thead><tr><th>Company</th><th>Revenue (Dec\'25–Feb\'26, ৳ Cr)</th><th>Digital spend (৳ Cr)</th><th>Reach (M)</th><th>Offline cont. %</th><th>Digital cont. %</th><th>Facebook</th></tr></thead><tbody>';
+  dig.forEach(function(r){
+    var o = off.filter(function(x){ return x[0]===r[0]; })[0] || [r[0],0];
+    var c = cont.filter(function(x){ return x[0]===r[0]; })[0];
+    var fb = (D.ext.facebook||[]).filter(function(x){ return x[0]===r[0] || x[0].replace(" City Group","")===r[0] || (r[0]==="City" && x[0].indexOf("City")>=0) || (r[0]==="ACI" && x[0].indexOf("ACI")>=0) || (r[0]==="Square" && x[0].indexOf("Square")>=0); })[0];
+    h+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+(c?cr(c[1]):"—")+'</td><td>'+r[1].toFixed(2)+'</td><td>'+r[2].toFixed(1)+'</td><td>'+(c?c[2].toFixed(2)+"%":"—")+'</td><td>'+(c?c[3].toFixed(2)+"%":"—")+'</td><td>'+(fb?fb[1]:"—")+'</td></tr>';
+  });
+  h+='</tbody></table><div class="small" style="margin-top:8px">Source: <b>ARL Competitor Analysis Dec\'25–Feb\'26</b> + <b>Akij Essential Data</b>. AEL spends ~1.6% of revenue on marketing vs ~2.8% for Square and PRAN — a real spend gap, not just a smaller base.</div>';
+  document.getElementById("compTable").innerHTML=h;
+})();
+
+/* ============ MARKET SHARE ============ */
+(function(){
+  var ms = (D.ext && D.ext.marketShare) || [];
+  var sorted = ms.slice().sort(function(a,b){ return b[2]-a[2]; });
+  var maxShare = sorted.length ? sorted[0][2] : 0;
+  var maxCat = sorted.length ? sorted[0][0] : "—";
+  var minCat = sorted.length ? sorted[sorted.length-1][0] : "—";
+  var minShare = sorted.length ? sorted[sorted.length-1][2] : 0;
+  var consumer = ms.filter(function(r){ return r[0].indexOf("Consumer")>=0; });
+  var consumerAvg = consumer.length ? consumer.reduce(function(s,r){return s+r[2];},0)/consumer.length : 0;
+  var k=[
+    {l:"Highest AEL share",v:maxShare.toFixed(2)+"%",n:maxCat},
+    {l:"Lowest AEL share",v:minShare.toFixed(2)+"%",n:minCat,c:"down"},
+    {l:"Categories tracked",v:ms.length,n:"market size + top-5 competitors"},
+    {l:"Avg consumer-cat share",v:consumerAvg.toFixed(2)+"%",n:"AEL is bulk-led, not a consumer brand",c:"down"}
+  ];
+  document.getElementById("msKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  // log-aware bar: use sqrt scale so tiny shares stay visible
+  var maxV = maxShare;
+  var items = sorted.map(function(r){ return {label:r[0], value:r[2], color:"#2f7dff"}; });
+  function sqrtBar(container, items){
+    var W=920,H=Math.max(260,items.length*24+40),L=200,R=70,T=12,B=12;
+    var svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("width","100%"); svg.setAttribute("height",H); svg.setAttribute("viewBox","0 0 "+W+" "+H); svg.setAttribute("preserveAspectRatio","xMinYMin meet");
+    container.innerHTML=""; container.appendChild(svg);
+    var mx=Math.sqrt(Math.max.apply(null, items.map(function(i){return i.value;})));
+    var x0=L,x1=W-R,y0=T,y1=H-B; var bh=(y1-y0)/items.length;
+    items.forEach(function(it,idx){
+      var bw=Math.max(2,(Math.sqrt(it.value)/mx)*(x1-x0));
+      var yy=y0+idx*bh+4;
+      var rect=document.createElementNS("http://www.w3.org/2000/svg","rect"); rect.setAttribute("x",x0); rect.setAttribute("y",yy); rect.setAttribute("width",bw); rect.setAttribute("height",bh-8); rect.setAttribute("rx","3"); rect.setAttribute("fill",it.color||"#2f7dff"); svg.appendChild(rect);
+      var t1=document.createElementNS("http://www.w3.org/2000/svg","text"); t1.setAttribute("x",x0-8); t1.setAttribute("y",yy+bh/2-4); t1.setAttribute("fill","#8fa0c4"); t1.setAttribute("font-size","12.5"); t1.setAttribute("text-anchor","end"); t1.textContent=it.label.length>24?it.label.slice(0,23)+"…":it.label; svg.appendChild(t1);
+      var t2=document.createElementNS("http://www.w3.org/2000/svg","text"); t2.setAttribute("x",x0+bw+5); t2.setAttribute("y",yy+bh/2-4); t2.setAttribute("fill","#e6ecff"); t2.setAttribute("font-size","12.5"); t2.textContent=it.value+"%"; svg.appendChild(t2);
+    });
+  }
+  sqrtBar(document.getElementById("cMsLadder"), items);
+  var h='<table><thead><tr><th>Category</th><th>Market size (৳ Cr)</th><th>AEL share</th><th>Top competitor</th><th>Top share</th></tr></thead><tbody>';
+  sorted.forEach(function(r){
+    h+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+cr(r[1])+'</td><td>'+r[2].toFixed(2)+'%</td><td>'+esc(r[3])+'</td><td>'+r[4].toFixed(2)+'%</td></tr>';
+  });
+  h+='</tbody></table><div class="small" style="margin-top:8px">Source: <b>Market Share Data H1 2025-26</b> (Google Sheet). AEL share is materially higher only in imports (Lentil 11.5%, Wheat 8.6%); in consumer categories it is 0.02–4.3%.</div>';
+  document.getElementById("msTable").innerHTML=h;
+})();
+
+/* ============ CHANNEL & INCENTIVES ============ */
+(function(){
+  var total=0; D.channels.forEach(function(c){total+=c[1];});
+  var bulk=D.channels.filter(function(c){return c[0]==="Bulk";})[0];
+  var dist=D.channels.filter(function(c){return c[0]==="Distributor";})[0];
+  var k=[
+    {l:"Total (FY26-27)",v:cr(total),n:"all channels"},
+    {l:"Bulk-first",v:(bulk?bulk[1]/total*100:0).toFixed(0)+"%",n:"Bulk + Flour&Dal + Rice Bulk"},
+    {l:"Distributor",v:(dist?dist[1]/total*100:0).toFixed(0)+"%",n:"consumer retail route"},
+    {l:"Dealer",v:"~0.2%",n:"no dealer-commission table in this ERP"}
+  ];
+  document.getElementById("commKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note">'+x.n+'</div></div>';}).join("");
+  barChart(document.getElementById("commType"),D.channels.map(function(c){return {label:c[0],value:c[1],color:c[0]==="Bulk"?"#f0b90b":(c[0]==="Distributor"?"#2f7dff":"#22c3aa")};}),{fmt:cr});
+  document.getElementById("incNotes").innerHTML=
+    '<div class="note-box"><b>Bulk-first economics.</b> Bulk (53%), Bulk Flour &amp; Dal (19%) and Rice Bulk (12%) carry ~84% of revenue on only ~18k orders — high value per order, thin margin, concentrated in Chittagong. Distributor (9%) is the consumer brand route, and Dealer is negligible.</div>'+
+    '<div class="note-box warn"><b>Incentives.</b> Free goods: <b>'+(D.freeGoods||0)+' free-item lines</b> delivered Jul–Oct 2026 (GL value 0 — they are free). Trade schemes (<code>rtm.tblRTMTradeOfferSetupHeader</code>) and booked discounts are empty/test data, and dealer commission lives in <code>arl_erp</code> (empty at build time) — so the only active channel lever visible in the ERP is free goods.</div>'+
+    '<div class="insight"><b>Concentration risk.</b> The top-2 bulk channels are ~72% of revenue — a supply or credit disruption there (as seen in October) hits the whole P&amp;L. Widening the distributor/chain-store route de-risks the book.</div>';
+})();
+
+/* ============ AREA ============ */
+(function(){
+  barChart(document.getElementById("zoneBar"),D.zones.map(function(z){return {label:z[0],value:z[1],color:"#2f7dff"};}),{fmt:cr});
+  var tot=D.zones.reduce(function(a,z){return a+z[1];},0);
+  var html='<table><thead><tr><th>Zone</th><th>Value</th><th>Deliveries</th><th>Share of top-16</th></tr></thead><tbody>';
+  D.zones.forEach(function(z){ html+='<tr><td><b>'+z[0]+'</b></td><td>'+cr(z[1])+'</td><td>'+z[2].toLocaleString("en-US")+'</td><td>'+(z[1]/tot*100).toFixed(1)+'%</td></tr>'; });
+  html+='</tbody></table>';
+  document.getElementById("zoneTable").innerHTML=html;
+})();
+
+/* ============ GROWTH ============ */
+(function(){
+  var y22=D.yearlyRev[2022],y23=D.yearlyRev[2023],y24=D.yearlyRev[2024],y25=D.yearlyRev[2025],y26=D.yearlyRev[2026];
+  function dl(f){ return D.yearlyDel[f]?D.yearlyDel[f][0]:null; }
+  var k=[
+    {l:"FY2023-24",v:cr(y23),n:dl(2023)+" deliveries"},
+    {l:"FY2024-25",v:cr(y24),n:pf(pct(y24,y23))+" · "+dl(2024)+" deliveries",c:pct(y24,y23)>=0?"up":"down"},
+    {l:"FY2025-26",v:cr(y25),n:pf(pct(y25,y24))+" · "+dl(2025)+" deliveries",c:pct(y25,y24)>=0?"up":"down"},
+    {l:"FY2026-27 (4 mo)",v:cr(y26),n:"Jul–Oct 2026 · partial",c:"up"},
+    {l:"FY25-26 vs FY24-25",v:pf(pct(y25,y24)),n:"revenue step-up",c:pct(y25,y24)>=0?"up":"down"}
+  ];
+  document.getElementById("growthKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  groupedBar(document.getElementById("revYear"),["FY2022-23","FY2023-24","FY2024-25","FY2025-26","FY2026-27*"],[
+    {name:"Net sales (৳ Cr)",data:[y22,y23,y24,y25,y26]}
+  ],{yfmt:fmtY,colors:["#2f7dff"]});
+  document.getElementById("revYear").insertAdjacentHTML("beforeend",
+    '<div class="small" style="margin-top:6px">Deliveries (activity proxy): '+dl(2022)+' → '+dl(2023)+' → '+dl(2024)+' → '+dl(2025)+'. *FY26-27 = 4 months (Jul–Oct). The FY25-26 step-up reflects real growth + fuller ERP bulk-channel coverage.</div>');
+})();
+
+/* ============ PROMOTION ============ */
+(function(){
+  var mb = D.mktBudget || {};
+  var spend26 = D.pnl && D.pnl[2026] ? D.pnl[2026].mkt : 7.3;
+  var bud26 = mb[2026] || 0;
+  var k=[
+    {l:"Marketing budget FY26-27",v:cr(bud26),n:"budget module · GL 4210001"},
+    {l:"Marketing spend YTD (Jul–Oct)",v:cr(spend26),n:"GL 4210001 actual",c:"up"},
+    {l:"Spend vs budget (YTD)",v:(bud26?(spend26/bud26*100).toFixed(0):"—")+"%",n:"of the full-year budget consumed in 4 months"},
+    {l:"Marketing-to-revenue",v:(D.pnl[2026]?(spend26/D.pnl[2026].rev*100).toFixed(1):"—")+"%",n:"well below FMCG norms (~5–8%)",c:"down"}
+  ];
+  document.getElementById("promoKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  groupedBar(document.getElementById("cMktBudget"),["FY2024-25","FY2025-26","FY2026-27"],[
+    {name:"Marketing budget (৳ Cr)",data:[mb[2025]||0, mb[2026]||0, (mb[2027]||0)]},
+    {name:"Actual spend (Jul–Oct)",data:[0, 0, spend26]}
+  ],{yfmt:fmtY,colors:["#3b4f8a","#f0b90b"]});
+  // marketing contribution vs competitors
+  var cont = (D.ext && D.ext.mktContribution) || [];
+  groupedBar(document.getElementById("cMktContribution"), cont.map(function(r){return r[0];}), [
+    {name:"Offline cont. %",data:cont.map(function(r){return r[2];})},
+    {name:"Digital cont. %",data:cont.map(function(r){return r[3];})}
+  ],{yfmt:function(v){return v.toFixed(2)+"%";},colors:["#2f7dff","#22c3aa"]});
+})();
+
+/* ============ VOICE OF CUSTOMER ============ */
+(function(){
+  var voc = D.voc || [];
+  var MNAM = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function seg(ch){ if(!ch) return "Other"; if(ch==="Dealer"||ch==="Distributor") return "Dealers (Trade)"; if(ch==="Corporate") return "Corporate"; if(ch==="Sister Concern") return "Sister Concern"; return "Other"; }
+  var att = voc.filter(function(r){ return r[6]==="Need attention"; });
+  var fu = voc.filter(function(r){ return r[6]==="Need follow up"; });
+  var attVal = att.reduce(function(s,r){return s+r[5];},0);
+  var fuVal = fu.reduce(function(s,r){return s+r[5];},0);
+  var zm = {}; voc.forEach(function(r){ zm[r[1]]=(zm[r[1]]||0)+1; });
+  var topZone = Object.keys(zm).sort(function(a,b){return zm[b]-zm[a];})[0];
+  var k=[
+    {l:"Need attention (4–5 mo idle)",v:att.length,n:cr(attVal)+" FY value",c:"down"},
+    {l:"Need follow up (2–3 mo idle)",v:fu.length,n:cr(fuVal)+" FY value",c:"down"},
+    {l:"Total inactive customers",v:voc.length,n:"last order Jun–Sep 2026"},
+    {l:"Top idle zone",v:topZone||"—",n:zm[topZone]+" idle customers"}
+  ];
+  document.getElementById("vocKpis").innerHTML=k.map(function(x){ return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  function renderVoc(){
+    var act = document.getElementById("vocAct").value;
+    var segf = document.getElementById("vocSeg").value;
+    var rows = voc.filter(function(r){ return (act==="all"||r[6]===act) && (segf==="all"||seg(r[2])===segf); });
+    var h='<table><thead><tr><th>Customer</th><th>Segment</th><th>Zone</th><th>Last order month</th><th>Last order amount (৳ Cr)</th><th>This FY amount (৳ Cr)</th><th>Activeness</th></tr></thead><tbody>';
+    rows.slice(0,150).forEach(function(r){
+      var actTag = r[6]==="Need attention" ? '<span class="tag t-pos">Need attention</span>' : '<span class="tag t-warn">Need follow up</span>';
+      h+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(seg(r[2]))+'</td><td>'+esc(r[1])+'</td><td>'+MNAM[r[3]-1]+"&#39;26</td><td>"+cr(r[4])+'</td><td>'+cr(r[5])+'</td><td>'+actTag+'</td></tr>';
+    });
+    h+='</tbody></table><div class="small" style="margin-top:8px">'+rows.length+' inactive customers. "Need attention" = no order for 4–5 months; "Need follow up" = 2–3 months. Call status / win-back = pending CRM sheet.</div>';
+    document.getElementById("vocTable").innerHTML=h;
+  }
+  document.getElementById("vocAct").addEventListener("change", renderVoc);
+  document.getElementById("vocSeg").addEventListener("change", renderVoc);
+  renderVoc();
+})();
+
+/* ============ PEOPLE ============ */
+(function(){
+  var people = D.people || [];
+  var attr = D.attrition || {};
+  var uniq = D.peopleUnique || {};
+  var top = people[0];
+  var k=[
+    {l:"District officers",v:people.length,n:"with a matched lost district"},
+    {l:"Top-risk officer",v:top?(top.name.split(" ").slice(-1)[0]):"—",n:top?(top.district+" · risk "+top.risk):"—",c:"down"},
+    {l:"Unique idle customers",v:(uniq.count||0),n:"across officers' districts"},
+    {l:"Idle value (deduped)",v:"৳"+(uniq.value||0).toFixed(1)+" Cr",n:"unique idle value, no double-count",c:"down"}
+  ];
+  document.getElementById("peopleKpis").innerHTML=k.map(function(x){
+    return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  function riskTag(v){ if(v>=60) return '<span class="tag t-pos">high</span>'; if(v>=30) return '<span class="tag t-warn">medium</span>'; return '<span class="tag t-neg">low</span>'; }
+  function renderPeople(){
+    var h='<table><thead><tr><th>Officer</th><th>District</th><th>Idle customers</th><th>Idle value (৳ Cr)</th><th>Risk</th><th></th></tr></thead><tbody>';
+    people.forEach(function(p, i){
+      h+='<tr class="drill" onclick="openProfile('+i+')"><td><b>'+esc(p.name)+'</b><br><span class="small">'+esc(p.code)+'</span></td><td>'+esc(p.district)+'</td><td>'+(p.lostCount||0)+'</td><td>'+(p.lostValue||0).toFixed(1)+'</td><td>'+(p.risk||0)+' '+riskTag(p.risk||0)+'</td><td><span class="small">▸</span></td></tr>';
+    });
+    h+='</tbody></table><div class="small" style="margin-top:8px">'+people.length+' district-positioned officers from People Desk. Click a row to open the KPI profile (pop-up).</div>';
+    document.getElementById("peopleTable").innerHTML=h;
+  }
+  function profileHTML(p){
+    var lost = p.lostCustomers || [];
+    var lc = lost.map(function(v){ return '<tr><td>'+esc(v[0])+'</td><td>'+esc(v[1])+'</td><td>'+cr(v[5])+'</td><td>'+(v[6]==="Need attention"?'<span class="tag t-pos">attention</span>':'<span class="tag t-warn">follow up</span>')+'</td></tr>'; }).join("");
+    return '<button class="close" onclick="closeProfile()">×</button>'+
+      '<div class="prof-head"><div><div class="nm">'+esc(p.name)+'</div><div class="small">'+esc(p.code)+' · District: <b>'+esc(p.district)+'</b> · Joined '+esc(p.joined)+' · Contact: HR master</div></div>'+
+      '<div class="risk-badge">Risk <b style="color:var(--gold)">'+p.risk+'/100</b> '+riskTag(p.risk)+'</div></div>'+
+      '<div class="card" style="margin-bottom:12px"><h3>KPI — numeric summary</h3><div class="grid g4">'+
+      '<div class="card kpi"><div class="lab">District Q1 loss</div><div class="val neg">−৳'+(p.districtLoss!=null?p.districtLoss.toFixed(2):(p.lostValue||0).toFixed(2))+' Cr</div></div>'+
+      '<div class="card kpi"><div class="lab">Idle customers</div><div class="val">'+p.lostCount+'</div></div>'+
+      '<div class="card kpi"><div class="lab">Idle value</div><div class="val">৳'+(p.lostValue||0).toFixed(1)+' Cr</div></div>'+
+      '<div class="card kpi"><div class="lab">Risk factor</div><div class="val">'+p.risk+'/100</div></div>'+
+      '</div></div>'+
+      '<div class="card" style="margin-bottom:12px"><h3>Diagnostic — solution</h3><div class="dda-expl" style="margin:0">'+diagnostic(p)+'</div></div>'+
+      '<div class="card"><h3>Loss customer list ('+p.lostCount+')</h3><table style="margin-top:6px"><thead><tr><th>Customer</th><th>Zone</th><th>FY ৳ Cr</th><th>Activeness</th></tr></thead><tbody>'+(lc||'<tr><td colspan="4" class="small">No idle customers matched in this district.</td></tr>')+'</tbody></table>'+
+      '<div class="small" style="margin-top:6px">Phone numbers are not in People Desk — join the CRM / KPI-vs-Lost sheet to append mobiles.</div></div>';
+  }
+  function diagnostic(p){
+    if(p.lostValue >= 20) return "Highest-exposure district — <b>"+esc(p.district)+"</b> holds the most idle value ("+p.lostCount+" customers, ৳"+(p.lostValue||0).toFixed(1)+" Cr). Fix: restore lentil/paddy supply to this district first, run a 30-day win-back call on the top idle mills, and re-price flagged SKUs to declared DP/TP. <b>Target: recover ≥50% of the idle value (≈৳"+((p.lostValue||0)*0.5).toFixed(1)+" Cr) by 31 Jan 2027.</b>";
+    if(p.lostValue >= 5) return "Mid-exposure district — <b>"+esc(p.district)+"</b> has "+p.lostCount+" concentrated idle bulk accounts (৳"+(p.lostValue||0).toFixed(1)+" Cr). Fix: target the top 5 idle accounts with a trade scheme + credit review, and enforce the declared price ladder. <b>Target: reactivate 5 accounts this quarter.</b>";
+    return "Lower-exposure district — <b>"+esc(p.district)+"</b>. Maintain coverage, re-activate the "+p.lostCount+" idle accounts, and watch the Q2 supply cycle before adding resources.";
+  }
+  window.openProfile=function(i){ var p=people[i]; if(!p) return; document.getElementById("profModalBody").innerHTML=profileHTML(p); document.getElementById("profModal").classList.add("on"); };
+  window.closeProfile=function(){ document.getElementById("profModal").classList.remove("on"); };
+  document.getElementById("profModal").addEventListener("click", function(e){ if(e.target===this) closeProfile(); });
+  renderPeople();
+  var sh='<table><thead><tr><th>Employee</th><th>Separation date</th></tr></thead><tbody>';
+  (attr.recent||[]).forEach(function(r){ sh+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td></tr>'; });
+  if(!(attr.recent||[]).length) sh+='<tr><td colspan="2" style="color:var(--muted)">No separations recorded.</td></tr>';
+  sh+='</tbody></table>';
+  document.getElementById("peopleSepTable").innerHTML=sh;
+})();
+
+/* ============ WHERE TO PLAY ============ */
+(function(){
+  var div = (D.ext && D.ext.divLoss) || [];
+  var totalLoss = div.reduce(function(s,r){return s+r[1];},0);
+  var districts = [];
+  div.forEach(function(r){ r[5].forEach(function(d){ districts.push([d[0], d[1], r[0]]); }); });
+  districts.sort(function(a,b){return b[1]-a[1];});
+  var top = districts[0];
+  var k=[
+    {l:"Total Q1 division loss",v:"−৳"+totalLoss.toFixed(2)+" Cr",n:"8 divisions + other",c:"down"},
+    {l:"Hardest-hit district",v:top[0],n:"−৳"+top[1].toFixed(2)+" Cr",c:"down"},
+    {l:"Divisions tracked",v:div.length,n:"all 8 admin divisions + other"},
+    {l:"Top-2 loss share",v:((div[0][1]+div[1][1])/totalLoss*100).toFixed(0)+"%",n:"Dhaka + Rajshahi"}
+  ];
+  document.getElementById("w2pKpis").innerHTML=k.map(function(x){ return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>';}).join("");
+  // chart: regions by default, click a bar to drill into its districts
+  var chartRegion = null;
+  function logBar(container, items, onBarClick){
+    var W=920,H=Math.max(240,items.length*34+50),L=170,R=96,T=12,B=12;
+    var svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("width","100%"); svg.setAttribute("height",H); svg.setAttribute("viewBox","0 0 "+W+" "+H); svg.setAttribute("preserveAspectRatio","xMinYMin meet");
+    container.innerHTML=""; container.appendChild(svg);
+    var mx=Math.log(1+Math.max.apply(null, items.map(function(i){return i.val;})));
+    var x0=L,x1=W-R,y0=T,y1=H-B,bh=(y1-y0)/items.length;
+    items.forEach(function(it,idx){
+      var bw=Math.max(2,(Math.log(1+it.val)/mx)*(x1-x0));
+      var yy=y0+idx*bh+4;
+      var rect=document.createElementNS("http://www.w3.org/2000/svg","rect"); rect.setAttribute("x",x0); rect.setAttribute("y",yy); rect.setAttribute("width",bw); rect.setAttribute("height",bh-8); rect.setAttribute("rx","3"); rect.setAttribute("fill","#ff5c7a"); rect.setAttribute("style","cursor:pointer"); rect.addEventListener("click",function(){ onBarClick(it.label); }); svg.appendChild(rect);
+      var t1=document.createElementNS("http://www.w3.org/2000/svg","text"); t1.setAttribute("x",x0-8); t1.setAttribute("y",yy+bh/2-4); t1.setAttribute("fill","#8fa0c4"); t1.setAttribute("font-size","12.5"); t1.setAttribute("text-anchor","end"); t1.textContent=it.label; svg.appendChild(t1);
+      var t2=document.createElementNS("http://www.w3.org/2000/svg","text"); t2.setAttribute("x",x0+bw+5); t2.setAttribute("y",yy+bh/2-4); t2.setAttribute("fill","#e6ecff"); t2.setAttribute("font-size","12.5"); t2.textContent="−"+it.val.toFixed(2)+" Cr"; svg.appendChild(t2);
+    });
+  }
+  function drawW2pChart(){
+    var container = document.getElementById("cW2p");
+    if (chartRegion) {
+      var reg = div.filter(function(r){ return r[0]===chartRegion; })[0];
+      var items = reg[5].map(function(d){ return { label: d[0], val: d[1] }; }).sort(function(a,b){return b.val-a.val;});
+      logBar(container, items, function(label){ w2pDrill(null); });
+      container.insertAdjacentHTML("afterbegin",'<div class="small" style="margin-bottom:6px"><span style="cursor:pointer;color:var(--gold)" onclick="w2pDrill(null)">← Back to regions</span> · <b>'+esc(chartRegion)+'</b> districts</div>');
+    } else {
+      var items = div.map(function(r){ return { label: r[0], val: r[1] }; }).sort(function(a,b){return b.val-a.val;});
+      logBar(container, items, function(label){ w2pDrill(label); });
+      container.insertAdjacentHTML("afterbegin",'<div class="small" style="margin-bottom:6px">Click a region bar to drill into its districts.</div>');
+    }
+  }
+  window.w2pDrill = function(name){ chartRegion = name; drawW2pChart(); };
+  drawW2pChart();
+  // table: region rows, click to expand districts
+  function districtTable(reg){
+    var dh='<table><thead><tr><th>District</th><th>Loss (৳ Cr)</th><th>Revenue (৳ Cr)</th><th>Volume (MT)</th></tr></thead><tbody>';
+    reg[5].slice().sort(function(a,b){return b[1]-a[1];}).forEach(function(d){
+      dh+='<tr><td><b>'+esc(d[0])+'</b></td><td class="neg">−'+d[1].toFixed(2)+'</td><td>'+d[2].toFixed(2)+'</td><td>'+d[3].toLocaleString("en-US")+'</td></tr>';
+    });
+    dh+='</tbody></table>';
+    return dh;
+  }
+  function drawW2pTable(){
+    var h='<table><thead><tr><th>Region</th><th>Loss (৳ Cr)</th><th>Revenue (৳ Cr)</th><th>Rev share %</th><th></th></tr></thead><tbody>';
+    div.forEach(function(r, i){
+      h+='<tr class="drill" onclick="toggleW2pRegion('+i+')"><td><b>'+esc(r[0])+'</b></td><td class="neg">−'+r[1].toFixed(2)+'</td><td>'+r[2].toFixed(2)+'</td><td>'+r[4].toFixed(2)+'%</td><td><span class="small">▸</span></td></tr>';
+      h+='<tr id="w2preg'+i+'" style="display:none"><td colspan="5" style="text-align:left;padding:12px">'+districtTable(r)+'</td></tr>';
+    });
+    h+='</tbody></table>';
+    document.getElementById("w2pTable").innerHTML=h;
+  }
+  window.toggleW2pRegion=function(i){ var el=document.getElementById("w2preg"+i); if(el) el.style.display = el.style.display==="none"?"table-row":"none"; };
+  drawW2pTable();
+  document.getElementById("w2pPlaybook").innerHTML=
+    '<div class="note-box"><b>Where to Play</b> — <b>Dhaka (−৳47.81 Cr)</b> is the priority; inside it <b>Gopalganj (−৳24.36 Cr)</b> alone is ~30% of the total loss, then <b>Narsingdi (−৳6.86 Cr)</b>. Second front <b>Rajshahi (−৳13.95 Cr)</b> (Rajshahi −6.93 · Pabna −5.71), then <b>Barishal (−৳6.65 Cr)</b> (Jhalokati −3.77) and <b>Chattogram (−৳5.29 Cr)</b> (Cumilla −1.57 · Brahmanbaria −1.21). The four smallest divisions (Khulna −3.81 · Sylhet −1.37 · Mymensingh −0.76 · Rangpur −0.45) are mopping-up, not strategic.</div>'+
+    '<div class="note-box"><b>Whom to Play</b> — the share moved to <b>Teer, Nabil, ACI, Fresh and Pusti</b> (the top-5 leaders in every lost category). In Gopalganj/Narsingdi the idle customers are bulk flour/rice/maida mills; in Jhalokati/Cumilla/Brahmanbaria they are rice/pulse/atta traders — names are in the Voice of Customer tab.</div>'+
+    '<div class="note-box warn"><b>How to Win</b> — 1) Restore <b>lentil/pea/paddy supply</b> (the Q1 root cause) so the Gopalganj bulk mills re-order; 2) Re-price the flagged SKUs back to declared <b>DP/TP</b> in the top 4 divisions; 3) Put the <b>district-positioned officers</b> (Pabna, Rajshahi, Naogaon, Narayanganj, Cumilla — see People tab) on a 30-day win-back call plan for their idle customers; 4) Cut <b>financing cost (৳68.9 Cr YTD)</b> so price competitiveness recovers without a margin leak.</div>';
+})();
+
+/* ============ DIRECTION · DECISION · ACTION ============ */
+(function(){
+  var y24=D.yearlyRev[2024],y25=D.yearlyRev[2025],y26=D.yearlyRev[2026];
+  var df=D.deficit, pnl=D.sbu;
+  var rev=df.comb_act, bud=df.comb_bud, deficit=df.deficit;
+  var loss=pnl.loss, budgetNp=pnl.budget_np;
+  var adverseGap=budgetNp+loss;
+  function revYm(y,m){ for(var i=0;i<D.monthly.length;i++){ if(D.monthly[i][0]===y && D.monthly[i][1]===m) return D.monthly[i][2]; } return 0; }
+  function readB(b){ return b==null?"not measurable":(b>0?"supply-driven":(b<-1?"elastic":"inelastic")); }
+
+  document.getElementById("ddaDirExpl").innerHTML=
+    '<ul style="margin:4px 0 0">'+
+    '<li><b>S</b> — Q1 FY27 + October opened in a <b>৳'+deficit.toFixed(1)+' Cr revenue deficit</b> (৳'+rev.toFixed(1)+' Cr vs ৳'+bud.toFixed(1)+' Cr budget) and a Q1 EAT loss of <b>−৳'+loss.toFixed(2)+' Cr</b> (budget −৳'+budgetNp.toFixed(1)+' Cr).</li>'+
+    '<li><b>M</b> — Close the <b>৳'+deficit.toFixed(1)+' Cr</b> revenue gap; hold GP% above the ~13.5% break-even so the bottom line turns.</li>'+
+    '<li><b>A</b> — Achievable: GP% already recovered to ~10.7% YTD; the gap is volume (supply), not price architecture.</li>'+
+    '<li><b>R</b> — Supply shortages (lentils, chickpeas, Miniket paddy), a deliberate AMS go-slow, NPD not yet injected, and salt-supply disruption are the drivers.</li>'+
+    '<li><b>T</b> — Recovery by <b>31 Jan 2027</b>, with weekly checkpoints and monthly reviews.</li></ul>';
+  var dirHtml='<table><thead><tr><th>Metric</th><th>Q1+Oct</th><th>Budget</th><th>Gap</th></tr></thead><tbody>';
+  dirHtml+='<tr><td>Net revenue (৳ Cr)</td><td>'+rev.toFixed(1)+'</td><td>'+bud.toFixed(1)+'</td><td class="neg"><b>−'+deficit.toFixed(1)+'</b></td></tr>';
+  dirHtml+='<tr><td>EAT (৳ Cr, Q1)</td><td class="neg">−'+loss.toFixed(2)+'</td><td>'+budgetNp.toFixed(1)+'</td><td class="neg"><b>−'+adverseGap.toFixed(2)+'</b></td></tr>';
+  dirHtml+='<tr><td>FY25-26 revenue (context)</td><td colspan="2">'+cr(y25)+'</td><td class="pos">'+pf(pct(y25,y24))+'</td></tr>';
+  dirHtml+='<tr><td>FY26-27 Jul–Oct (orders)</td><td colspan="2">'+cr(y26)+'</td><td class="pos">in progress</td></tr>';
+  dirHtml+='</tbody></table>';
+  document.getElementById("ddaDirTable").innerHTML=dirHtml;
+  var mlab=D.monthly.map(function(m){return mn(m[1])+String(m[0]).slice(2);});
+  var mrev=D.monthly.map(function(m){return m[2];});
+  lineChart(document.getElementById("ddaDirChart"),[{name:"Monthly net revenue",data:mrev,w:2.2}],mlab,{yfmt:fmtY,ytitle:"Revenue (৳ Cr)",tipfmt:cr,colors:["#2f7dff"]});
+
+  document.getElementById("ddaDecExpl").innerHTML=
+    'Five choices follow from the data. <ul style="margin-top:2px">'+
+    '<li><b>1 · Enforce the declared DP/TP/MRP ladder</b><ul>'+
+    '<li>GP% is <b>10.7%</b> vs <b>13.5%</b> break-even — the margin is already thin.</li>'+
+    '<li><b>~10 SKUs</b> are flagged &gt;5% below their declared TP.</li>'+
+    '<li>Every point of discount below TP leaks straight to the bottom line.</li></ul></li>'+
+    '<li><b>2 · Concentrate the portfolio on the bulk core</b><ul>'+
+    '<li>Flour + Wheat + Bran + Lentils &amp; Pulses ≈ <b>60%</b> of FY26-27 YTD revenue.</li>'+
+    '<li>Protect these supply chains first, then grow the higher-margin consumer (rice, oil) tail.</li></ul></li>'+
+    '<li><b>3 · Attack financing, not price</b><ul>'+
+    '<li>Financing cost is <b>৳'+D.pnl[2026].fin.toFixed(0)+' Cr YTD</b> — the largest single bottom-line drag.</li>'+
+    '<li>Receivables and working capital are the fastest lever.</li></ul></li>'+
+    '<li><b>4 · Win back the lost divisions</b><ul>'+
+    '<li>Q1 division loss <b>−৳80.46 Cr</b> across 8 divisions.</li>'+
+    '<li><b>Dhaka −47.81</b> (Gopalganj −24.36 · Narsingdi −6.86).</li>'+
+    '<li><b>Rajshahi −13.95</b> (Rajshahi −6.93 · Pabna −5.71).</li>'+
+    '<li><b>Barishal −6.65</b> (Jhalokati −3.77) · <b>Chattogram −5.29</b> (Cumilla −1.57).</li>'+
+    '<li>A district-level win-back beats broad-based discounting.</li></ul></li>'+
+    '<li><b>5 · Close the marketing gap</b><ul>'+
+    '<li>AEL spends <b>~1.6%</b> of revenue on marketing vs <b>~2.8%</b> for Square/PRAN.</li>'+
+    '<li>Consumer share is only <b>0.02–4.3%</b>.</li>'+
+    '<li>The brand is under-invested, not over-priced.</li></ul></li></ul>';
+  var topCats=CATS.slice().sort(function(a,b){ return (D.catFy[b]&&D.catFy[b][2026]||0)-(D.catFy[a]&&D.catFy[a][2026]||0); }).slice(0,8);
+  var decHtml='<table><thead><tr><th>Category</th><th>FY26-27 YTD</th><th>FY25-26</th><th>β</th><th>Read</th></tr></thead><tbody>';
+  topCats.forEach(function(c){
+    decHtml+='<tr><td><b>'+esc(c)+'</b></td><td>'+cr(D.catFy[c][2026]||0)+'</td><td>'+cr(D.catFy[c][2025]||0)+'</td><td>'+(EL[c]?EL[c].b.toFixed(2):"—")+'</td><td>'+readB(EL[c]?EL[c].b:null)+'</td></tr>';
+  });
+  decHtml+='</tbody></table>';
+  document.getElementById("ddaDecTable").innerHTML=decHtml;
+  barChart(document.getElementById("ddaDecChart"),topCats.map(function(c){return {label:c,value:D.catFy[c][2026]||0};}),{fmt:cr});
+
+  document.getElementById("ddaActExpl").innerHTML=
+    'Five moves from the recovery plan, each tied to a number. <ul>'+
+    '<li><b>Restore raw-material supply</b> (lentils, chickpeas, yellow peas, Miniket paddy) — the #1 driver of the Q1/Oct shortfall.</li>'+
+    '<li><b>Enforce the declared price ladder</b> and eliminate SKUs trading &gt;5% below TP.</li>'+
+    '<li><b>Launch the budgeted NPD</b> — high-margin products were included in the budget but not yet injected.</li>'+
+    '<li><b>Cut financing cost</b> (৳'+D.pnl[2026].fin.toFixed(0)+' Cr YTD) through receivables collection and working-capital discipline.</li>'+
+    '<li><b>Restart the go-slow channels</b> (AMS) and stabilise salt supply.</li>'+
+    '<li><b>Run the Gopalganj/Narsingdi/Pabna win-back.</b> Target the idle bulk mills in these three districts (see Voice of Customer) with restored supply, a trade scheme and a 30-day call plan — this alone addresses ~46% of the Q1 division loss (36.93 Cr of 80.46 Cr).</li></ul>';
+  var actRows=[
+    [1,"Restore raw-material supply (lentils/chickpeas/paddy)","October 130 Cr vs 410 Cr budget — supply, not demand","High","Revenue"],
+    [2,"Enforce DP/TP/MRP ladder","~10 SKUs >5% below TP; GP 10.7% vs 13.5% breakeven","High","Margin"],
+    [3,"Inject budgeted NPD (high-margin)","NPD included in budget, not launched","High","Margin + mix"],
+    [4,"Cut financing cost","financing ৳"+D.pnl[2026].fin.toFixed(0)+" Cr YTD — largest bottom-line drag","Medium","EAT"],
+    [5,"Restart go-slow channels + salt supply","AMS go-slow + salt disruption in root cause","Medium","Volume"]
+  ];
+  var actHtml='<table><thead><tr><th>#</th><th>Action</th><th>Basis (data)</th><th>Priority</th><th>Impact</th></tr></thead><tbody>';
+  actRows.forEach(function(r){
+    var pc=r[3]==="High"?"pri-hi":(r[3]==="Medium"?"pri-md":"pri-lo");
+    actHtml+='<tr><td>'+r[0]+'</td><td><b>'+r[1]+'</b></td><td>'+r[2]+'</td><td class="'+pc+'">'+r[3]+'</td><td>'+r[4]+'</td></tr>';
+  });
+  actHtml+='</tbody></table>';
+  document.getElementById("ddaActTable").innerHTML=actHtml;
+  var mm=[7,8,9,10];
+  groupedBar(document.getElementById("ddaActChart"), mm.map(function(m){return mn(m);}), [
+    {name:"FY25-26",data:mm.map(function(m){return revYm(2025,m);})},
+    {name:"FY26-27",data:mm.map(function(m){return revYm(2026,m);})}
+  ],{yfmt:fmtY,colors:["#3b4f8a","#f0b90b"]});
+
+  var p24=D.pnl[2024],p25=D.pnl[2025],p26=D.pnl[2026];
+  function gpPct(p){ return (p.rev-p.cogs)/p.rev*100; }
+  var gps=[[2024,gpPct(p24)],[2025,gpPct(p25)],[2026,gpPct(p26)]];
+  document.getElementById("ddaLossExpl").innerHTML=
+    'AEL has <b>no SKU-level COGS</b> in the ERP, so a per-SKU loss list is not publishable — the margin screen is business-level. The honest at-risk signal is <b>GP% vs break-even (~13.5%)</b>. <ul>'+
+    '<li><b>Direction:</b> GP% was 2.8% (FY24-25) → 3.1% (FY25-26) → 10.7% (FY26-27 YTD) — recovering but still below break-even in two of three years.</li>'+
+    '<li><b>Decision:</b> hold the price ladder; any SKU trading below TP is a leak — re-price to declared levels.</li>'+
+    '<li><b>Action:</b> enforce the ladder, restore supply, then lift volume so fixed + financing cost is absorbed.</li></ul>';
+  barChart(document.getElementById("ddaLossChart"),gps.map(function(g){return {label:"FY"+g[0]+(g[0]===2026?" (YTD)":""),value:g[1],color:g[1]<13.5?"#ff5c7a":"#2fd181"};}),{fmt:function(v){return v.toFixed(1)+"%";}});
+  var lh='<table><thead><tr><th>Year</th><th>Revenue</th><th>COGS</th><th>GP%</th><th>vs 13.5% break-even</th></tr></thead><tbody>';
+  gps.forEach(function(g){
+    var p = g[0]===2024?p24:(g[0]===2025?p25:p26);
+    lh+='<tr><td><b>FY'+g[0]+(g[0]===2026?" (YTD)":"")+'</b></td><td>'+cr(p.rev)+'</td><td>'+cr(p.cogs)+'</td><td class="'+(g[1]>=13.5?"pos":"neg")+'">'+g[1].toFixed(1)+'%</td><td>'+(g[1]>=13.5?'<span class="tag t-neg">above</span>':'<span class="tag t-pos">below</span>')+'</td></tr>';
+  });
+  lh+='</tbody></table><div class="small" style="margin-top:8px">Break-even gross margin ≈13.5% of revenue (fixed + financing cost). GP% below that → EAT loss. FY26-27 YTD GP% is 10.7% — close, but financing (৳'+p26.fin.toFixed(0)+' Cr) still tips EAT negative.</div>';
+  document.getElementById("ddaLossTable").innerHTML=lh;
+
+  document.getElementById("ddaRecoveryExpl").innerHTML=
+    '<b style="color:var(--gold)">Diagnosis — where the loss is</b><p style="margin:3px 0 9px">Q1 (Jul–Sep) achieved <b>৳'+df.q1_act.toFixed(1)+' Cr vs ৳'+df.q1_bud.toFixed(1)+' Cr budget</b> (−'+((df.q1_bud-df.q1_act)).toFixed(1)+' Cr); October achieved only <b>৳'+df.oct_act.toFixed(1)+' Cr vs ৳'+df.oct_bud.toFixed(1)+' Cr</b>. Combined deficit <b>৳'+deficit.toFixed(1)+' Cr</b>, plus a Q1 EAT loss of <b>−৳'+loss.toFixed(2)+' Cr</b>. The shortfall is supply-driven (raw-material shortages, AMS go-slow, un-launched NPD, salt disruption), not demand; the loss is thin GP plus a large financing cost.</p>'+
+    '<b style="color:var(--gold)">SMART recovery plan</b><ul style="margin:4px 0 9px">'+
+    '<li><b>S</b> — 30-day SKU/plant/customer recovery with weekly revenue &amp; volume targets. <b>M</b> — 100% of the monthly budget; recover the ৳'+deficit.toFixed(1)+' Cr. <b>A</b> — supply levers are controllable. <b>R</b> — restores the biggest gap. <b>T</b> — 31 Jan 2027.</li>'+
+    '<li><b>S</b> — Prioritise Consumer + Corporate, Bulk Rice, Bulk Flour &amp; Dal, Modern Trade, HORECA, and pending Tender conversion. <b>M</b> — lift the monthly run-rate to budget.</li>'+
+    '<li><b>S</b> — Introduce high-margin products (the budgeted NPD). <b>M</b> — lift GP% above 13.5% break-even. <b>T</b> — 31 Jan 2027.</li></ul>'+
+    '<b style="color:var(--gold)">Game theory — how competitors respond</b><ul style="margin:4px 0 9px">'+
+    '<li>Cut price to buy volume → Bashundhara / Teer / ACI match on staples → price war, no share gain, margin destroyed. <b>Do not.</b></li>'+
+    '<li>Hold the ladder + guarantee supply &amp; credit → competitors lose the availability lever; AEL wins on reliability.</li>'+
+    '<li><b>Equilibrium:</b> match on price, compete on supply security, delivery coverage and credit — not discounting.</li></ul>'+
+    '<b style="color:var(--gold)">7P — where to focus (numeric)</b><ul style="margin:4px 0 0">'+
+    '<li><b>Product:</b> restore lentil/pea/paddy supply → recover the <b>−৳80.46 Cr</b> Q1 division loss (8 divisions; Dhaka −47.81 is 59% of it); launch NPD for a <b>+2.8pp GP</b> lift (10.7% → 13.5% break-even).</li>'+
+    '<li><b>Price:</b> enforce DP/TP/MRP → move the <b>~10 SKUs &gt;5% below TP</b> back to declared rate (≈ +1pp GP).</li>'+
+    '<li><b>Place:</b> Gopalganj (−24.36), Narsingdi (−6.86), Pabna (−5.71) first — <b>~46% of the division loss in 3 districts</b>; then the Dhaka/Narayanganj belt.</li>'+
+    '<li><b>Promotion:</b> close the marketing gap <b>1.6% → 2.8%</b> of revenue (≈ +৳8 Cr/yr) behind the retail packs; AEL digital spend is the lowest of 6 (৳0.35 Cr vs Square ৳1.10 Cr).</li>'+
+    '<li><b>People:</b> deploy the <b>'+D.people.length+' district-positioned officers</b> (People tab) on a 30-day win-back of their idle customers.</li>'+
+    '<li><b>Process:</b> weekly win-back checkpoints; monthly management reviews; target date <b>31 Jan 2027</b>.</li>'+
+    '<li><b>Physical evidence:</b> the published DP/TP/MRP rate card vs competitors\u2019 opaque bulk pricing.</li></ul>';
+  barChart(document.getElementById("ddaRecoveryChart"),[
+    {label:"Budget (Q1 + Oct)",value:df.comb_bud,color:"#3b4f8a"},
+    {label:"Actual (Q1 + Oct)",value:df.comb_act,color:"#2f7dff"},
+    {label:"Deficit",value:deficit,color:"#ff5c7a"}
+  ],{fmt:function(v){return "৳"+v.toFixed(1)+" Cr";}});
+  var rt='<table><thead><tr><th>Item</th><th>Budget</th><th>Actual</th><th>Gap</th></tr></thead><tbody>';
+  rt+='<tr><td>Q1 (Jul–Sep) revenue</td><td>'+df.q1_bud.toFixed(1)+'</td><td>'+df.q1_act.toFixed(1)+'</td><td class="neg"><b>−'+(df.q1_bud-df.q1_act).toFixed(1)+'</b></td></tr>';
+  rt+='<tr><td>October revenue</td><td>'+df.oct_bud.toFixed(1)+'</td><td>'+df.oct_act.toFixed(1)+'</td><td class="neg"><b>−'+(df.oct_bud-df.oct_act).toFixed(1)+'</b></td></tr>';
+  rt+='<tr style="border-top:2px solid var(--line)"><td><b>Combined (Q1 + Oct)</b></td><td><b>'+df.comb_bud.toFixed(1)+'</b></td><td><b>'+df.comb_act.toFixed(1)+'</b></td><td class="neg"><b>−'+deficit.toFixed(1)+'</b></td></tr>';
+  rt+='<tr><td>EAT (Q1)</td><td>'+budgetNp.toFixed(1)+'</td><td class="neg">−'+loss.toFixed(2)+'</td><td class="neg"><b>−'+adverseGap.toFixed(2)+'</b></td></tr>';
+  rt+='<tr><td>Target</td><td colspan="3">31 January 2027 — weekly checkpoints, monthly reviews (October GL subject to final posting)</td></tr>';
+  rt+='</tbody></table>';
+  document.getElementById("ddaRecoveryTable").innerHTML=rt;
+})();
+
+/* ============ chart synopses ============ */
+(function(){
+  syn("cPort", ["Net revenue climbed <b>৳1,599 Cr → ৳3,238 Cr</b> (FY24-25 → FY25-26) and is running at <b>৳703 Cr</b> for FY26-27 YTD.","Bars are lumpy month-to-month — staples demand is harvest/import-cycle driven.","The teal line shows all 12 categories sell each month (broad activity)."]);
+  syn("cBreadth", ["Green = categories that raised price vs the prior month; red = categories that cut.","Blended prices move together — a wheat/import cost shift moves flour, bran and pulses at once."]);
+  syn("cJourney", ["Consumer categories (Salt, Edible Oil, Rice) are the cleanest price series — bulk categories are noisy due to mixed pack sizes.","Premium rice and pulses swing the most; salt is the most stable."]);
+  syn("netPriceChart", ["Realised net price per unit, overall or by category.","Salt reads a stable ~৳26–34/unit; bulk wheat ~৳34–45k/tonne.","Use the selector to isolate one category or overlay all."]);
+  syn("waterfall", ["How FY26-27 YTD (Jul–Oct) breaks down: revenue ৳690 Cr → COGS ৳616 Cr → gross profit ৳74 Cr (~10.7%).","Financing (৳69 Cr YTD) is the largest single cost after COGS.","Break-even gross margin is ≈13.5% — the business is close but not yet above it."]);
+  syn("gpnpTrend", ["Revenue vs COGS by fiscal year — the gap is gross profit.","GP% recovered from 2.8% (FY24-25) to 10.7% (FY26-27 YTD).","The FY25-26 revenue step-up is the scale story; the FY26-27 GP% is the margin story."]);
+  syn("skuRank", ["Coarse Bran 37 kg and Maida 50 kg are the two biggest SKUs (≈৳60 Cr and ≈৳51 Cr FY26-27 YTD).","The top SKUs are bulk flour/bran — the consumer packs are the tail.","This is the concentration the Decision block discusses."]);
+  syn("momChart", ["One category's volume and realised price, month by month.","Where price and volume move together it is supply/seasonality; opposite directions suggest demand.","Pick any category, or click a row in the All SKUs table."]);
+  syn("cDeclared", ["AEL declares DP (118 SKUs), TP (110) and MRP (67).","The DP→MRP gap is a price-architecture gap for consumer packs.","Enforcing this ladder is the fastest margin lever at 10.7% GP vs 13.5% break-even."]);
+  syn("cEl", ["Own-price elasticity: teal = elastic (β&lt;−1), red = anomalous (β&gt;0).","Staples read anomalous or inelastic because volume is supply/seasonality-driven.","Positive β is usually supply pass-through, not demand — investigate before pricing on it."]);
+  syn("cScatter", ["Each point is one category-month, centred on that category's own average price &amp; volume.","Top-left = price up, volume down (normal); top-right = both up (supply-driven)."]);
+  syn("commType", ["Bulk (53%), Bulk Flour &amp; Dal (19%) and Rice Bulk (12%) carry ~84% of revenue.","Distributor (9%) is the consumer route; Dealer is negligible.","AEL is fundamentally a B2B bulk staples business with a consumer tail."]);
+  syn("zoneBar", ["Chittagong (৳2,046 Cr) is the port hub for imported wheat/pulses — ~3× the next zone.","The Dhaka/Narayanganj industrial belt is second.","Concentration reflects an import-led supply chain."]);
+  syn("revYear", ["Net revenue by fiscal year: "+cr(D.yearlyRev[2022])+" (FY22-23) → "+cr(D.yearlyRev[2025])+" (FY25-26).","The FY25-26 step-up reflects real growth + fuller ERP bulk-channel coverage.","Do not annualise FY26-27 yet — only 4 months in."]);
+  syn("ddaDirChart", ["The full monthly revenue trajectory behind the Direction story.","The October shortfall (130 Cr vs 410 Cr budget) is a supply event, not a demand collapse."]);
+  syn("ddaDecChart", ["Top categories by FY26-27 YTD revenue.","Flour + Wheat + Bran + Lentils &amp; Pulses ≈ 60% — protect these supply chains first."]);
+  syn("ddaActChart", ["July–October revenue, FY25-26 vs FY26-27.","FY26-27 is running behind the prior year every month — the volume recovery is still to come.","The gap to close is the ৳318.3 Cr combined budget shortfall."]);
+  syn("ddaLossChart", ["Business-level GP% by fiscal year, against the ~13.5% break-even line.","Red = below break-even. FY26-27 YTD (10.7%) is close but still short.","No SKU-level COGS → the margin screen is business-level, not per-SKU."]);
+  syn("ddaRecoveryChart", ["Q1 + October budget vs actual, plus the deficit to close.","The ৳318.3 Cr shortfall is the recovery target; the ৳20.91 Cr Q1 EAT loss is the profit target.","Recovery = restore supply, enforce the price ladder, launch NPD, cut financing — by 31 Jan 2027."]);
+})();
+
+/* ============ boot: deep link ============ */
+(function(){
+  var h=location.hash.slice(1);
+  if(TABS.indexOf(h)>=0) showTab(h);
+})();
+</script>
+</body>
+</html>
