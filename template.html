@@ -420,6 +420,12 @@
     </div>
     <div class="scroll" id="vocTable"></div>
   </div>
+  <div class="card" style="margin-top:14px">
+    <h3>Call register — lost customers called</h3>
+    <div class="hint">Random calls to customers idle 6+ months. Their voice (why they stopped), present supplier, and what would win them back.</div>
+    <div class="grid g4" id="crmKpis" style="margin-bottom:12px"></div>
+    <div class="scroll" id="crmTable"></div>
+  </div>
 </section>
 
 <!-- ============ PEOPLE ============ -->
@@ -1479,6 +1485,27 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
   document.getElementById("vocAct").addEventListener("change", renderVoc);
   document.getElementById("vocSeg").addEventListener("change", renderVoc);
   renderVoc();
+})();
+
+/* ============ CRM CALL REGISTER ============ */
+(function(){
+  var calls = D.crmCalls || [];
+  var s = D.crmSummary || {};
+  if (!calls.length) return;
+  var tr = s.topReasons || [];
+  var k = [
+    {l:"Customers called",v:calls.length,n:"of "+(s.totalLost||"—")+" churned (6+ mo)"},
+    {l:"Top churn reason",v:tr[0]?tr[0][0]:"—",n:tr[0]?(tr[0][1]+" of "+calls.length+" · then "+(tr[1]?tr[1][0]:"")):"—"},
+    {l:"Top present supplier",v:"Pusti · Nabil · ACI",n:s.topCompetitors||"—",c:"down"},
+    {l:"Win-back lever",v:(s.winbackLevers||["—"])[0],n:(s.winbackLevers||[]).slice(1).join(" · ")}
+  ];
+  document.getElementById("crmKpis").innerHTML = k.map(function(x){ return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>'; }).join("");
+  var h='<table><thead><tr><th>Customer</th><th>Why they stopped</th><th>Present supplier</th><th>How to win them back</th></tr></thead><tbody>';
+  calls.forEach(function(c){
+    h+='<tr><td><b>'+esc(c[0])+'</b><br><span class="small">'+(c[1]?esc(c[1]):"—")+' · '+esc(c[2]||"—")+'</span></td><td>'+esc(c[3]||"—")+'</td><td>'+esc(c[4]||"—")+'</td><td>'+esc(c[5]||"—")+'</td></tr>';
+  });
+  h+='</tbody></table><div class="small" style="margin-top:8px">'+calls.length+' customers called (idle 6+ months). Source: "Akij Essential CRM Data collection from Lost Dealers" Google Sheet.</div>';
+  document.getElementById("crmTable").innerHTML=h;
 })();
 
 /* ============ PEOPLE ============ */
