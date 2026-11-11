@@ -53,6 +53,12 @@
   .pos{color:var(--green)} .neg{color:var(--red)}
   .scroll{max-height:560px;overflow:auto;border-radius:10px;border:1px solid var(--line)}
   .items{max-width:320px;font-size:11.5px;line-height:1.35;color:var(--muted)}
+  .finder{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .finder li{display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.35;position:relative;padding:3px 6px;border-radius:5px}
+  .finder .bar{position:absolute;left:0;top:0;bottom:0;background:rgba(240,185,11,.15);border-radius:5px}
+  .finder .rt{position:relative;flex:1;z-index:1}
+  .finder .cnt{color:var(--muted);font-size:11.5px;white-space:nowrap}
+  .finder .dot{color:var(--gold)}
   .toolbar{display:flex;gap:9px;align-items:center;margin-bottom:9px;flex-wrap:wrap}
   input[type=search],select{background:var(--panel2);border:1px solid var(--line);color:var(--tx);padding:7px 10px;border-radius:8px;font-size:14px;outline:none}
   input[type=search]:focus,select:focus{border-color:var(--accent)}
@@ -385,11 +391,17 @@
 
 <!-- ============ VOICE OF CUSTOMER ============ -->
 <section id="voc">
-  <div class="guide"><span class="gl">What this answers</span><p>Which customers AEL is serving and which it has stopped serving — who, where, how much, and how long since their last order.</p><span class="gl">How to read it</span><p>Activeness = time since the last order (as of Nov 2026): <b>Active</b> = ordered Oct–Nov (0–1 mo); <b>Follow up</b> = Aug–Sep (2–3 mo); <b>Need attention</b> = Jun–Jul (4–5 mo); <b>Churned</b> = before Jun 2026 (6+ mo). <b>Segment</b> = the dealer's primary distribution channel (most frequent). Call status / win-back come from the CRM call-back register.</p></div>
-  <div class="grid g4" id="vocKpis" style="margin-bottom:12px"></div>
+  <div class="guide"><span class="gl">What this answers</span><p>Why AEL has lost customers and what would win them back — distilled from live call-backs — plus the full customer activeness register.</p><span class="gl">How to read it</span><p><b>Findings</b> = the aggregated themes from lost-customer calls (why they left, where they went, what would bring them back). The <b>Customer activeness register</b> (last) = every customer tagged Active / Follow up / Need attention / Churned by time since their last order (as of Nov 2026).</p></div>
   <div class="card">
+    <h3>Findings — lost-customer calls</h3>
+    <div class="hint">Random calls to customers idle 6+ months. Aggregated themes, not individual quotes.</div>
+    <div class="grid g4" id="crmKpis" style="margin-bottom:12px"></div>
+    <div class="grid g3" id="crmFindings"></div>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3>Customer activeness register — as of Nov'26</h3>
-    <div class="hint">Last order month + amount, and this FY (Jul–Nov) order amount. All customers, tagged Active / Follow up / Need attention / Churned. Segment = primary distribution channel.</div>
+    <div class="hint">Last order month + amount, and this FY (Jul–Nov) order amount. All customers, tagged Active / Follow up / Need attention / Churned. Segment = primary distribution channel. Click a row for full details + order history.</div>
+    <div class="grid g4" id="vocKpis" style="margin-bottom:12px"></div>
     <div class="toolbar">
       <select id="vocAct">
         <option value="all">All activeness</option>
@@ -419,12 +431,6 @@
       </select>
     </div>
     <div class="scroll" id="vocTable"></div>
-  </div>
-  <div class="card" style="margin-top:14px">
-    <h3>Call register — lost customers called</h3>
-    <div class="hint">Random calls to customers idle 6+ months. Their voice (why they stopped), present supplier, and what would win them back.</div>
-    <div class="grid g4" id="crmKpis" style="margin-bottom:12px"></div>
-    <div class="scroll" id="crmTable"></div>
   </div>
 </section>
 
@@ -1487,25 +1493,32 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
   renderVoc();
 })();
 
-/* ============ CRM CALL REGISTER ============ */
+/* ============ CRM FINDINGS ============ */
 (function(){
-  var calls = D.crmCalls || [];
   var s = D.crmSummary || {};
-  if (!calls.length) return;
-  var tr = s.topReasons || [];
+  if (!s.called) return;
+  var reasons = s.reasons || [], competitors = s.competitors || [], winback = s.winback || [];
   var k = [
-    {l:"Customers called",v:calls.length,n:"of "+(s.totalLost||"—")+" churned (6+ mo)"},
-    {l:"Top churn reason",v:tr[0]?tr[0][0]:"—",n:tr[0]?(tr[0][1]+" of "+calls.length+" · then "+(tr[1]?tr[1][0]:"")):"—"},
-    {l:"Top present supplier",v:"Pusti · Nabil · ACI",n:s.topCompetitors||"—",c:"down"},
-    {l:"Win-back lever",v:(s.winbackLevers||["—"])[0],n:(s.winbackLevers||[]).slice(1).join(" · ")}
+    {l:"Customers called",v:s.called,n:"of "+(s.totalLost||"—")+" churned (6+ mo)"},
+    {l:"Top churn reason",v:reasons[0]?reasons[0][0]:"—",n:reasons[0]?(reasons[0][1]+" of "+s.called+" · then "+(reasons[1]?reasons[1][0]:"")):"—"},
+    {l:"Top present supplier",v:competitors[0]?competitors[0][0]:"—",n:competitors[1]?competitors[1][0]+" · "+competitors[2][0]:"",c:"down"},
+    {l:"Top win-back lever",v:winback[0]||"—",n:winback.slice(1,2).join(" · ")}
   ];
   document.getElementById("crmKpis").innerHTML = k.map(function(x){ return '<div class="card kpi"><div class="lab">'+x.l+'</div><div class="val">'+x.v+'</div><div class="note '+(x.c||"")+'">'+x.n+'</div></div>'; }).join("");
-  var h='<table><thead><tr><th>Customer</th><th>Why they stopped</th><th>Present supplier</th><th>How to win them back</th></tr></thead><tbody>';
-  calls.forEach(function(c){
-    h+='<tr><td><b>'+esc(c[0])+'</b><br><span class="small">'+(c[1]?esc(c[1]):"—")+' · '+esc(c[2]||"—")+'</span></td><td>'+esc(c[3]||"—")+'</td><td>'+esc(c[4]||"—")+'</td><td>'+esc(c[5]||"—")+'</td></tr>';
-  });
-  h+='</tbody></table><div class="small" style="margin-top:8px">'+calls.length+' customers called (idle 6+ months). Source: "Akij Essential CRM Data collection from Lost Dealers" Google Sheet.</div>';
-  document.getElementById("crmTable").innerHTML=h;
+  var maxR = Math.max.apply(null, reasons.map(function(r){return r[1];}).concat([1]));
+  var reasonHtml = '<ul class="finder">' + reasons.map(function(r){
+    return '<li><span class="bar" style="width:'+Math.round(r[1]/maxR*100)+'%"></span><span class="rt">'+esc(r[0])+'</span><span class="cnt">'+r[1]+' of '+s.called+'</span></li>';
+  }).join("") + '</ul>';
+  var compHtml = '<ul class="finder">' + competitors.map(function(c){
+    return '<li><span class="rt">'+esc(c[0])+'</span><span class="cnt">'+c[1]+' mention'+(c[1]===1?"":"s")+'</span></li>';
+  }).join("") + '</ul>';
+  var winHtml = '<ul class="finder">' + winback.map(function(w){
+    return '<li><span class="dot">▪</span><span class="rt">'+esc(w)+'</span></li>';
+  }).join("") + '</ul>';
+  document.getElementById("crmFindings").innerHTML =
+    '<div class="card"><h3>Why they left</h3>'+reasonHtml+'</div>' +
+    '<div class="card"><h3>Where they went</h3>'+compHtml+'</div>' +
+    '<div class="card"><h3>How to win them back</h3>'+winHtml+'</div>';
 })();
 
 /* ============ PEOPLE ============ */
