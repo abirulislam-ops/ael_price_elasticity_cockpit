@@ -1384,6 +1384,7 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
 /* ============ VOICE OF CUSTOMER ============ */
 (function(){
   var voc = D.vocReg || D.voc || [];
+  var vocIndex = {}; voc.forEach(function(r, i){ vocIndex[r[0]] = i; });
   var MNAM = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   function actTag(act){
     if(act==="Active") return '<span class="tag t-neg">Active</span>';
@@ -1403,6 +1404,52 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
     var more = tot > 4 ? " … +" + (tot - 4) + " more" : "";
     return '<span title="' + esc(its.join(", ")) + '">' + esc(shown + more) + '</span>';
   }
+  function custHTML(r){
+    var det = (D.custDetails && D.custDetails[r[0]]) || {};
+    var orders = (D.custOrders && D.custOrders[r[0]]) || [];
+    var its = (D.itemsMap && D.itemsMap[r[0]]) || [];
+    var tot = (D.itemsTotal && D.itemsTotal[r[0]]) || its.length;
+    var tag = actTag(r[7]);
+    var cv = function(s){ return (s == null || s === "" || s === "0") ? "—" : s; };
+    var detRows = [
+      ["Phone", cv(det.phone)],
+      ["Contact person", cv(det.cp)],
+      ["Proprietor", cv(det.prop)],
+      ["District", cv(det.district)],
+      ["Upazila", cv(det.upazila)],
+      ["Division", cv(det.division)],
+      ["Address", cv(det.addr)],
+      ["Email", cv(det.email)],
+      ["Delivery zone", cv(r[1])],
+      ["Channel", cv(r[2])],
+      ["Segment (primary)", cv(r[3])]
+    ].map(function(d){ return '<tr><td class="lab">' + d[0] + '</td><td>' + esc(d[1]) + '</td></tr>'; }).join("");
+    var ordRows = orders.length ? orders.map(function(o){
+      return '<tr><td>' + o[0] + '</td><td>' + cr(o[1]) + '</td><td>' + o[2].toLocaleString("en-US") + '</td></tr>';
+    }).join("") : '<tr><td colspan="3" class="small">No orders in the last 12 months.</td></tr>';
+    var itemsList = its.length ? its.join(", ") + (tot > its.length ? " … +" + (tot - its.length) + " more" : "") : "—";
+    return '<button class="close" onclick="closeProfile()">×</button>' +
+      '<div class="prof-head"><div><div class="nm">' + esc(r[0]) + '</div>' +
+      '<div class="small">' + esc(r[3] || "—") + ' · ' + esc(r[1] || "—") + '</div></div>' +
+      '<div class="risk-badge">' + tag + '</div></div>' +
+      '<div class="grid g4" style="margin-bottom:12px">' +
+        '<div class="card kpi"><div class="lab">Last order</div><div class="val">' + lastMoLab(r) + '</div><div class="note">' + cr(r[5]) + ' last amount</div></div>' +
+        '<div class="card kpi"><div class="lab">FY 26-27 amount</div><div class="val">' + cr(r[6]) + '</div></div>' +
+        '<div class="card kpi"><div class="lab">Segment</div><div class="val">' + esc(r[3] || "—") + '</div></div>' +
+        '<div class="card kpi"><div class="lab">Items ordered</div><div class="val">' + tot + '</div><div class="note">distinct SKUs</div></div>' +
+      '</div>' +
+      '<div class="card" style="margin-bottom:12px"><h3>Customer details</h3><table style="margin-top:6px">' + detRows + '</table></div>' +
+      '<div class="card" style="margin-bottom:12px"><h3>Ordered items</h3><p class="small" style="margin-top:6px">' + esc(itemsList) + '</p></div>' +
+      '<div class="card"><h3>Order history — last 12 months (' + orders.length + ' orders)</h3>' +
+      '<table style="margin-top:6px"><thead><tr><th>Date</th><th>Amount (৳ Cr)</th><th>Volume</th></tr></thead><tbody>' + ordRows + '</tbody></table>' +
+      '<div class="small" style="margin-top:6px">Showing up to 15 most recent orders since Nov 2025.</div></div>';
+  }
+  window.openCust = function(i){
+    var r = voc[i];
+    if (!r) return;
+    document.getElementById("profModalBody").innerHTML = custHTML(r);
+    document.getElementById("profModal").classList.add("on");
+  };
   var active = voc.filter(function(r){ return r[7]==="Active"; });
   var fu = voc.filter(function(r){ return r[7]==="Follow up"; });
   var att = voc.filter(function(r){ return r[7]==="Need attention"; });
@@ -1423,9 +1470,9 @@ window.addEventListener("hashchange",function(){ showTab(location.hash.slice(1))
     var rows = voc.filter(function(r){ return (actf==="all"||r[7]===actf) && (segf==="all"||((r[3]||"Other")===segf)); });
     var h='<table><thead><tr><th>Customer</th><th>Segment</th><th>Ordered items</th><th>Zone</th><th>Last order month</th><th>Last order amount (৳ Cr)</th><th>FY 26-27 amount (৳ Cr)</th><th>Activeness</th></tr></thead><tbody>';
     rows.slice(0,150).forEach(function(r){
-      h+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[3]||"—")+'</td><td class="items">'+itemsCell(r)+'</td><td>'+esc(r[1])+'</td><td>'+lastMoLab(r)+'</td><td>'+cr(r[5])+'</td><td>'+cr(r[6])+'</td><td>'+actTag(r[7])+'</td></tr>';
+      h+='<tr class="drill" onclick="openCust('+vocIndex[r[0]]+')"><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[3]||"—")+'</td><td class="items">'+itemsCell(r)+'</td><td>'+esc(r[1])+'</td><td>'+lastMoLab(r)+'</td><td>'+cr(r[5])+'</td><td>'+cr(r[6])+'</td><td>'+actTag(r[7])+'</td></tr>';
     });
-    h+='</tbody></table><div class="small" style="margin-top:8px">'+rows.length+' customers (showing first 150 — use the filters to narrow). Tagged Active / Follow up / Need attention / Churned as of Nov 2026. Segment = primary distribution channel. "Ordered items" = top items by value (hover for the full top-8 list). Call status / win-back = pending CRM sheet.</div>';
+    h+='</tbody></table><div class="small" style="margin-top:8px">'+rows.length+' customers (showing first 150 — use the filters to narrow). Click a row for full details + order history. Tagged Active / Follow up / Need attention / Churned as of Nov 2026. Segment = primary distribution channel.</div>';
     document.getElementById("vocTable").innerHTML=h;
   }
   document.getElementById("vocAct").addEventListener("change", renderVoc);
